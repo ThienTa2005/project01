@@ -1,169 +1,204 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hệ đa agent dự đoán tiểu đường</title>
-<style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--mute:#667085;--line:#e3e7ee;--accent:#1d6fd6;--ok:#16825d;--bad:#c4361f;--warn:#b7791f}
-@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b212a;--ink:#e8ecf2;--mute:#97a1b0;--line:#2b3340;--accent:#5aa2ff;--ok:#43c394;--bad:#ff7a63;--warn:#e3b04b}}
-*{box-sizing:border-box}
-body{margin:0;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
-header{padding:28px 20px 8px;max-width:1000px;margin:auto}
-h1{margin:0 0 4px;font-size:24px}
-header p{margin:0;color:var(--mute)}
-nav{max-width:1000px;margin:14px auto 0;padding:0 20px;display:flex;gap:6px}
-nav button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:8px;cursor:pointer;font:inherit}
-nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-main{max-width:1000px;margin:14px auto 40px;padding:0 20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
-.card h2{margin:0 0 10px;font-size:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
-label{display:block;font-size:13px;color:var(--mute)}
-input,select{width:100%;margin-top:3px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
-input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
-details summary{cursor:pointer;font-weight:600}
-details .hint{color:var(--mute);font-size:13px;margin:4px 0 12px}
-.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{background:var(--accent);color:#fff;border:0;padding:10px 22px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:400}
-.btn:disabled{opacity:.6;cursor:wait}
-.err{color:var(--bad)}
-.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
-.agent{border:1px solid var(--line);border-radius:10px;padding:14px}
-.agent h3{margin:0 0 8px;font-size:14px}
-.pct{font-size:30px;font-weight:700}
-.bar{position:relative;height:10px;background:var(--line);border-radius:6px;margin:8px 0 4px}
-.bar i{display:block;height:100%;border-radius:6px}
-.bar b{position:absolute;top:-4px;width:2px;height:18px;background:var(--ink)}
-.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff}
-.small{font-size:12px;color:var(--mute)}
-.vote{font-size:17px;font-weight:600;margin:0 0 12px}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-.scroll{overflow-x:auto}
-.figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.figs img{width:100%;border-radius:8px;border:1px solid var(--line);background:#fff}
-.disc{font-size:13px;color:var(--mute);border-left:3px solid var(--warn);padding-left:10px}
-.hide{display:none}
-textarea{width:100%;min-height:100px;resize:vertical;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
-.pipes{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap;margin-bottom:12px}
-.pipes span{padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;flex:1;text-align:center;min-width:125px;font-size:13px;font-weight:600}
-.pipes b{align-self:center;color:var(--accent)}
-.col2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.well{border:1px solid var(--line);background:var(--bg);padding:12px;border-radius:9px}
-.well p{margin:4px 0 10px}
-.pill{display:inline-block;font-size:11px;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:3px 8px;margin:2px}
-.answer{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.65;margin:0}
-.cite-list{padding-left:20px}.cite-list li{margin-bottom:7px}
-.trace{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px}
-.graph-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-.graph-wrap svg{width:100%;min-width:500px;display:block;max-height:530px}
-.status{font-size:12px;color:var(--mute)}
-.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;overflow-wrap:anywhere}
-@media(max-width:600px){nav{flex-wrap:wrap}nav button{font-size:13px;padding:8px 11px}.card{padding:14px}}
-
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#087f73">
+  <meta name="description" content="Hệ đa tác tử hỗ trợ dự đoán nguy cơ đái tháo đường, Knowledge Graph và RAG có trích dẫn.">
+  <title>DiaCare AI · Hỗ trợ sức khỏe chuyển hóa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-<header>
-  <h1>Hệ đa agent Diabetes · Knowledge Graph · RAG</h1>
-  <p>3 mô hình dự đoán từ dữ liệu khác nhau + Knowledge Base có nguồn + Vector/Graph/Hybrid RAG. Bản demo học thuật, không chẩn đoán.</p>
-</header>
-<nav><button id="t1" class="on">Dự đoán (3 agent)</button><button id="t3">KB + RAG Chatbot</button><button id="t4">Đồ thị Knowledge Graph</button><button id="t2">Kết quả nghiên cứu</button></nav>
-<main>
-<section id="p1">
-  <form id="f" autocomplete="off">
-    <div class="card"><h2>Thông tin chung <span class="small">(tự điền sang các agent)</span></h2><div class="grid" id="g-common"></div></div>
-    <div class="card"><details id="d-pima"><summary>Agent Pima – chỉ số lâm sàng</summary><p class="hint">Bỏ trống trường nào, mô hình tự điền bằng trung vị.</p><div class="grid" id="g-pima"></div></details></div>
-    <div class="card"><details id="d-kaggle100k"><summary>Agent Diabetes 100k – HbA1c &amp; đường huyết</summary><p class="hint">Có HbA1c sẽ chính xác hơn nhiều.</p><div class="grid" id="g-kaggle100k"></div></details></div>
-    <div class="card"><details id="d-brfss"><summary>Agent BRFSS – khảo sát lối sống, bệnh nền</summary><p class="hint">Cần điền ≥ 50% trường (kể cả tuổi, BMI) thì agent mới tham gia.</p><div class="grid" id="g-brfss"></div></details></div>
-    <div class="actions">
-      <button class="btn" id="go">Dự đoán</button>
-      <button type="button" class="btn ghost" id="ex">Điền ví dụ</button>
-      <button type="button" class="btn ghost" id="rs">Xóa</button>
-      <span class="err" id="err"></span>
-    </div>
-  </form>
-  <div class="card hide" id="out" style="margin-top:14px">
-    <p class="vote" id="vote"></p><div class="res" id="res"></div>
-    <p class="disc" style="margin-top:14px">Mô hình nghiên cứu cho môn học, <b>không phải công cụ chẩn đoán y khoa</b>. Mỗi agent học từ một quần thể khác nhau nên kết quả có thể mâu thuẫn; hãy hỏi bác sĩ khi lo ngại.</p>
-  </div>
-</section>
-<section id="p2" class="hide">
-  <div class="card"><h2>Chỉ số trên tập test</h2><div class="scroll"><table id="tbl"></table></div></div>
-  <div class="card"><h2>Biểu đồ</h2><div class="figs" id="figs"></div></div>
-</section>
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
 
-<section id="p3" class="hide">
-  <div class="card">
-    <h2>Demo KB + RAG + Multi-Agent</h2>
-    <div class="pipes"><span>1. Câu hỏi</span><b>→</b><span>2. Vector Search + Graph Query</span><b>→</b><span>3. Fusion</span><b>→</b><span>4. Trả lời có nguồn</span></div>
-    <p class="small">Dữ liệu tri thức được tóm lược, biên tập và liên kết nguồn từ WHO, NIDDK, CDC, Vinmec. Hệ thống nhận diện ý định, đồng nghĩa và câu hỏi nối tiếp; Vector dùng TF-IDF từ + ký tự. Khi đính kèm chỉ số, yêu cầu chạy qua Coordinator → Patient Data → Deep Learning → Rule-Based → KG/RAG → Explanation → Monitoring.</p>
-  </div>
-  <div class="card">
-    <h2>Chatbot hỏi đáp dựa trên Knowledge Base</h2>
-    <label for="kb-q">Nhập câu hỏi về bệnh đái tháo đường</label>
-    <textarea id="kb-q" maxlength="600" placeholder="Ví dụ: Vì sao đái tháo đường có thể gây biến chứng thận?">HbA1c bao nhiêu là đái tháo đường?</textarea>
-    <p class="small">Có thể hỏi bằng cách diễn đạt tự nhiên và hỏi nối tiếp, ví dụ: “Insulin có vai trò gì?” → “Còn ở típ 2 thì sao?”.</p>
-    <div class="grid" style="margin:12px 0">
-      <label>Phương pháp RAG<select id="kb-method"><option value="hybrid">Hybrid Graph + Vector</option><option value="vector">Vector RAG (TF-IDF)</option><option value="graph">GraphRAG (Neo4j/NetworkX)</option></select></label>
-      <label>Top-k bằng chứng<input id="kb-topk" type="number" min="1" max="12" value="5"></label>
-      <label>Số chặng trên KG<input id="kb-hops" type="number" min="1" max="3" value="2"></label>
-      <label>Trọng số Vector α (0–1)<input id="kb-alpha" type="number" min="0" max="1" step="0.1" value="0.5"></label>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Điều hướng chính">
+    <a class="brand" href="#" aria-label="DiaCare AI - Trang chính">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path d="M20 5.5c5.7 6.2 10.2 11.8 10.2 18.1A10.2 10.2 0 1 1 9.8 23.6C9.8 17.3 14.3 11.7 20 5.5Z"/><path class="brand-cross" d="M18 15h4v6h6v4h-6v6h-4v-6h-6v-4h6z"/></svg>
+      </span>
+      <span><strong>DiaCare</strong><small>AI Health Assistant</small></span>
+    </a>
+
+    <div class="sidebar-label">Không gian làm việc</div>
+    <nav class="main-nav">
+      <button id="t1" class="nav-item on" type="button" data-title="Đánh giá nguy cơ" data-subtitle="Hội đồng ba mô hình phân tích độc lập">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"/></svg></span>
+        <span><b>Đánh giá nguy cơ</b><small>3 Predictive Agents</small></span>
+      </button>
+      <button id="t3" class="nav-item" type="button" data-title="Trợ lý DiaBot" data-subtitle="Hỏi đáp y khoa có nguồn kiểm chứng">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 15a4 4 0 0 1-4 4H8l-5 3 1.7-5.1A7 7 0 0 1 3 12V9a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/></svg></span>
+        <span><b>Trợ lý DiaBot</b><small>Graph RAG Chat</small></span>
+      </button>
+      <button id="t4" class="nav-item" type="button" data-title="Knowledge Graph" data-subtitle="Khám phá thực thể, quan hệ và nguồn tri thức">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="8" r="3"/><circle cx="10" cy="18" r="3"/><path d="m8.7 7.3 6.6-.6M7.5 8.6l1.8 6.5m3.2 1.1 3.9-5.5"/></svg></span>
+        <span><b>Knowledge Graph</b><small>Neo4j · NetworkX</small></span>
+      </button>
+      <button id="t2" class="nav-item" type="button" data-title="Kết quả nghiên cứu" data-subtitle="Hiệu năng, biểu đồ và đánh giá mô hình">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10m5 10V4m5 16v-8m5 8V7"/><path d="m3 7 5-4 5 5 7-6"/></svg></span>
+        <span><b>Kết quả nghiên cứu</b><small>Metrics &amp; Reports</small></span>
+      </button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+    <div class="system-card">
+      <div class="system-card-head"><span class="live-dot"></span><strong>Hệ thống sẵn sàng</strong></div>
+      <p>7 tác tử phối hợp · dữ liệu được xử lý theo phiên.</p>
+      <div class="system-line"><span>Chế độ</span><b>Nghiên cứu</b></div>
     </div>
-    <label style="display:flex;gap:7px;align-items:center;margin:12px 0;color:var(--ink)"><input type="checkbox" id="kb-include-patient" style="width:auto;margin:0"> Chạy toàn bộ MAS hỗ trợ quyết định từ các chỉ số ở tab Dự đoán</label>
-    <div class="actions"><button class="btn" id="kb-go" type="button">Truy xuất và trả lời</button><button class="btn ghost" id="kb-example" type="button">Câu hỏi demo đa chặng</button><span class="err" id="kb-error"></span></div>
+    <p class="sidebar-foot">Không thay thế tư vấn, chẩn đoán hoặc điều trị của bác sĩ.</p>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-mark mini" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 5.5c5.7 6.2 10.2 11.8 10.2 18.1A10.2 10.2 0 1 1 9.8 23.6C9.8 17.3 14.3 11.7 20 5.5Z"/><path class="brand-cross" d="M18 15h4v6h6v4h-6v6h-4v-6h-6v-4h6z"/></svg></span><b>DiaCare AI</b></div>
+      <div class="page-context"><span class="eyebrow">DIABETES DECISION SUPPORT</span><h1 id="view-title">Đánh giá nguy cơ</h1><p id="view-subtitle">Hội đồng ba mô hình phân tích độc lập</p></div>
+      <div class="topbar-actions">
+        <span class="privacy-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z"/></svg>Phiên riêng tư</span>
+        <span class="profile-avatar" title="Người dùng">NA</span>
+      </div>
+    </header>
+
+    <main>
+      <section id="p1">
+        <div class="hero risk-hero">
+          <div class="hero-content">
+            <span class="hero-kicker"><span></span> Phân tích đa mô hình</span>
+            <h2>Hiểu rõ nguy cơ.<br><em>Chủ động sớm hơn.</em></h2>
+            <p>Ba tác tử AI đối chiếu dữ liệu lâm sàng, xét nghiệm và lối sống để tạo góc nhìn tổng hợp, minh bạch và dễ giải thích.</p>
+            <div class="hero-badges"><span>✓ 3 mô hình độc lập</span><span>✓ Không lưu hồ sơ</span><span>✓ Có giải thích</span></div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="orbital-ring ring-one"></div><div class="orbital-ring ring-two"></div>
+            <div class="health-orb"><span class="pulse-line"><i></i><b></b><i></i></span><small>AI HEALTH</small><strong>360°</strong><em>analysis</em></div>
+            <span class="float-stat stat-a"><i>03</i>Agents</span><span class="float-stat stat-b"><i>07</i>Signals</span>
+          </div>
+        </div>
+
+        <div class="section-intro">
+          <div><span class="section-kicker">Bước 1 · Hồ sơ đầu vào</span><h2>Thông tin sức khỏe</h2><p>Điền những gì bạn biết. Các trường không bắt buộc có thể để trống.</p></div>
+          <span class="section-count"><b>01</b> / 02</span>
+        </div>
+
+        <form id="f" autocomplete="off">
+          <div class="card form-card primary-form-card">
+            <div class="card-head"><div class="card-icon teal"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg></div><div><h3>Thông tin chung</h3><p>Được đồng bộ sang các tác tử phù hợp</p></div><span class="required-note">Bắt buộc</span></div>
+            <div class="grid form-grid" id="g-common"></div>
+          </div>
+
+          <div class="agent-input-grid">
+            <div class="card collapsible-card">
+              <details id="d-pima">
+                <summary><span class="agent-symbol blue"><svg viewBox="0 0 24 24"><path d="M4 17h3l2-8 4 11 3-7h4"/></svg></span><span><b>Pima Clinical Agent</b><small>Chỉ số lâm sàng cơ bản</small></span><i class="chevron"></i></summary>
+                <div class="detail-body"><p class="hint">Bỏ trống trường chưa biết, mô hình sẽ tự điền bằng trung vị.</p><div class="grid form-grid compact" id="g-pima"></div></div>
+              </details>
+            </div>
+            <div class="card collapsible-card featured-agent">
+              <details id="d-kaggle100k" open>
+                <summary><span class="agent-symbol violet"><svg viewBox="0 0 24 24"><path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/></svg></span><span><b>Metabolic Agent</b><small>HbA1c &amp; đường huyết</small></span><span class="recommended">Khuyên dùng</span><i class="chevron"></i></summary>
+                <div class="detail-body"><p class="hint">Có chỉ số HbA1c sẽ giúp đánh giá chính xác hơn đáng kể.</p><div class="grid form-grid compact" id="g-kaggle100k"></div></div>
+              </details>
+            </div>
+            <div class="card collapsible-card">
+              <details id="d-brfss">
+                <summary><span class="agent-symbol amber"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11Z"/></svg></span><span><b>Lifestyle Agent</b><small>Lối sống &amp; bệnh nền</small></span><i class="chevron"></i></summary>
+                <div class="detail-body"><p class="hint">Cần điền ít nhất 50% trường để tác tử này tham gia bỏ phiếu.</p><div class="grid form-grid compact" id="g-brfss"></div></div>
+              </details>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <div><span class="shield-note"><svg viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.3c0 4.7 3.2 8.5 7.5 9.7 4.3-1.2 7.5-5 7.5-9.7V6z"/><path d="m9 12 2 2 4-4"/></svg>Dữ liệu chỉ được dùng cho phiên hiện tại</span><span class="err" id="err"></span></div>
+            <div class="actions"><button type="button" class="btn ghost" id="rs">Xóa dữ liệu</button><button type="button" class="btn soft" id="ex">Điền dữ liệu mẫu</button><button class="btn primary" id="go"><span>Phân tích nguy cơ</span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div>
+          </div>
+        </form>
+
+        <div class="card result-panel hide" id="out">
+          <div class="result-heading"><div><span class="section-kicker">Bước 2 · Kết quả hội đồng</span><h2 id="vote">Đang tổng hợp kết quả</h2></div><span class="result-stamp">AI ANALYSIS</span></div>
+          <div class="res" id="res"></div>
+          <div class="medical-notice"><span>i</span><p>Mô hình phục vụ nghiên cứu học thuật, <b>không phải công cụ chẩn đoán y khoa</b>. Kết quả giữa các tác tử có thể khác nhau vì được huấn luyện từ những quần thể khác nhau. Hãy trao đổi với bác sĩ khi có lo ngại.</p></div>
+        </div>
+      </section>
+
+      <section id="p2" class="hide">
+        <div class="page-hero compact-hero research-hero"><div><span class="hero-kicker"><span></span> Model Intelligence</span><h2>Hiệu năng có thể kiểm chứng</h2><p>Theo dõi khả năng phân biệt, độ nhạy, độ đặc hiệu và hiệu chỉnh xác suất của từng mô hình.</p></div><div class="metric-decoration"><b>AUC</b><strong>0–1</strong><small>Đánh giá trên tập test</small></div></div>
+        <div class="stats-strip"><div><span>03</span><p>Datasets độc lập</p></div><div><span>06</span><p>Thước đo chính</p></div><div><span>100%</span><p>Truy vết thí nghiệm</p></div></div>
+        <div class="card"><div class="card-title-row"><div><span class="section-kicker">Bảng chỉ số</span><h3>Đánh giá trên tập kiểm thử</h3></div><span class="status-badge success"><i></i>Đã hoàn tất</span></div><div class="scroll data-table-wrap"><table id="tbl"></table></div></div>
+        <div class="card"><div class="card-title-row"><div><span class="section-kicker">Trực quan hóa</span><h3>Biểu đồ phân tích mô hình</h3></div></div><div class="figs" id="figs"></div></div>
+      </section>
+
+      <section id="p3" class="hide">
+        <div class="chat-layout">
+          <div class="chat-shell">
+            <div class="chat-header">
+              <div class="bot-avatar"><svg viewBox="0 0 32 32"><path d="M8 11h16a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4Z"/><path d="M16 5v6M13 5h6M10 19h.01M16 19h.01M22 19h.01"/></svg><span></span></div>
+              <div><h2>DiaBot</h2><p><span class="online-dot"></span>Trợ lý tri thức đang hoạt động</p></div>
+              <div class="chat-header-tags"><span>Graph RAG</span><span>7 Agents</span></div>
+            </div>
+
+            <div id="kb-chat-messages" class="chat-messages" aria-live="polite">
+              <div class="message-row assistant-message">
+                <div class="message-avatar"><svg viewBox="0 0 32 32"><path d="M8 11h16a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4Z"/><path d="M16 5v6M10 19h.01M16 19h.01M22 19h.01"/></svg></div>
+                <div class="message-stack"><div class="message-meta"><b>DiaBot</b><span>Vừa xong</span></div><div class="message-bubble"><p>Xin chào! Tôi có thể giúp bạn tìm hiểu về đái tháo đường bằng nguồn tri thức đã được kiểm chứng.</p><p>Bạn muốn bắt đầu với chủ đề nào?</p></div>
+                  <div class="suggestion-list"><button type="button" data-chat-example="HbA1c bao nhiêu là đái tháo đường?">Ngưỡng HbA1c</button><button type="button" data-chat-example="Vì sao đái tháo đường có thể gây biến chứng thận?">Biến chứng thận</button><button type="button" data-chat-example="Làm gì để phòng ngừa đái tháo đường típ 2?">Cách phòng ngừa</button></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-composer-wrap">
+              <div class="chat-composer">
+                <textarea id="kb-q" rows="1" maxlength="600" aria-label="Tin nhắn cho DiaBot" placeholder="Nhập câu hỏi về đái tháo đường..."></textarea>
+                <button id="kb-go" class="send-button" type="button" aria-label="Gửi câu hỏi"><svg viewBox="0 0 24 24"><path d="m4 4 17 8-17 8 3-8zM7 12h14"/></svg></button>
+              </div>
+              <div class="composer-footer"><span>Enter để gửi · Shift + Enter để xuống dòng</span><button class="text-button" id="kb-example" type="button">Gợi ý câu hỏi</button></div>
+              <div class="chat-options">
+                <label class="switch-label"><input type="checkbox" id="kb-include-patient"><span class="switch"></span><span>Phân tích kèm chỉ số ở tab Đánh giá</span></label>
+                <details class="advanced-settings"><summary>Tùy chỉnh truy xuất <svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg></summary><div class="advanced-grid"><label>Phương pháp RAG<select id="kb-method"><option value="hybrid">Hybrid Graph + Vector</option><option value="vector">Vector RAG (TF-IDF)</option><option value="graph">GraphRAG (Neo4j/NetworkX)</option></select></label><label>Top-k bằng chứng<input id="kb-topk" type="number" min="1" max="12" value="5"></label><label>Số chặng trên KG<input id="kb-hops" type="number" min="1" max="3" value="2"></label><label>Trọng số Vector α<input id="kb-alpha" type="number" min="0" max="1" step="0.1" value="0.5"></label></div></details>
+              </div>
+              <span class="err chat-error" id="kb-error"></span>
+            </div>
+          </div>
+
+          <aside class="chat-inspector">
+            <div class="inspector-head"><div><span class="section-kicker">Live reasoning</span><h3>Không gian phân tích</h3></div><span class="status-badge success"><i></i>Sẵn sàng</span></div>
+            <div class="pipeline-mini"><span><b>1</b>Hiểu ý định</span><i></i><span><b>2</b>Truy xuất KG</span><i></i><span><b>3</b>Tổng hợp</span></div>
+            <div class="empty-insight" id="kb-empty-insight"><div class="insight-radar"><span></span><i></i></div><h4>Kết quả sẽ xuất hiện tại đây</h4><p>Nguồn tham khảo, đồ thị liên quan và nhật ký tác tử được hiển thị sau khi bạn gửi câu hỏi.</p></div>
+
+            <div class="inspector-results hide" id="kb-result">
+              <div class="answer-summary"><span class="answer-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M8.5 14.5A7 7 0 1 1 15.5 14.5c-1 .7-1.5 1.5-1.5 2.5h-4c0-1-.5-1.8-1.5-2.5Z"/></svg></span><div><small>Câu trả lời tổng hợp</small><p id="kb-answer" class="answer"></p></div></div>
+              <details class="inspector-section" open><summary><span><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h6"/></svg>Bằng chứng truy xuất</span><i class="chevron"></i></summary><div id="kb-snippets" class="inspector-body"></div></details>
+              <details class="inspector-section" open><summary><span><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>Nguồn liên kết</span><i class="chevron"></i></summary><ol id="kb-sources" class="cite-list inspector-body"></ol></details>
+              <details class="inspector-section"><summary><span><svg viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="8" r="2"/><circle cx="10" cy="19" r="2"/><path d="m7 5.5 10 2M6 7l3 10m3-1 5.5-6"/></svg>Đồ thị con liên quan</span><i class="chevron"></i></summary><div class="inspector-body"><div id="kb-subgraph" class="graph-wrap"></div></div></details>
+              <details class="inspector-section"><summary><span><svg viewBox="0 0 24 24"><path d="M9 3h6l1 3 3 1v6l-3 1-1 3H9l-1-3-3-1V7l3-1z"/><circle cx="12" cy="10" r="2"/></svg>Nhật ký tác tử</span><i class="chevron"></i></summary><div class="inspector-body"><div id="kb-trace" class="trace"></div><div id="kb-mas" class="well hide"></div><div id="kb-ml" class="well hide"></div></div></details>
+              <div class="medical-notice compact"><span>i</span><p>Nội dung mang tính tham khảo, không thay thế tư vấn y khoa.</p></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="p4" class="hide">
+        <div class="page-hero compact-hero graph-hero"><div><span class="hero-kicker"><span></span> Explainable knowledge</span><h2>Bản đồ tri thức đái tháo đường</h2><p>Khám phá cách bệnh, yếu tố nguy cơ, xét nghiệm, biến chứng và khuyến nghị được kết nối với nguồn gốc rõ ràng.</p></div><div class="graph-decoration" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span></div></div>
+        <div class="card graph-overview-card">
+          <div class="card-title-row"><div><span class="section-kicker">Knowledge Base</span><h3>Tổng quan dữ liệu tri thức</h3></div><span id="neo4j-status" class="status-badge neutral"><i></i>Đang kiểm tra kết nối</span></div>
+          <div id="kb-stats" class="stat-cards"></div>
+          <div class="pipeline-wide"><span><b>01</b>Web / PDF nguồn</span><i>→</i><span><b>02</b>Chuẩn hóa thực thể</span><i>→</i><span><b>03</b>Nodes + Relations</span><i>→</i><span><b>04</b>RAG có nguồn</span></div>
+          <div class="actions"><a class="btn ghost" href="/kb-diabetes/kb_diabetes.cypher" download><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>Neo4j Cypher</a><a class="btn ghost" href="/kb-diabetes/kb_diabetes.graphml" download><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>GraphML</a></div>
+        </div>
+        <div class="card graph-canvas-card"><div class="card-title-row"><div><span class="section-kicker">Interactive map</span><h3>Thực thể và quan hệ</h3></div><label class="inline-control">Thực thể trung tâm<select id="kb-focus"><option value="Đái tháo đường">Đái tháo đường</option></select></label></div><p class="small" id="kb-graph-count"></p><div id="kb-fullgraph" class="graph-wrap graph-large"></div></div>
+        <div class="two-column-grid">
+          <div class="card"><div class="card-title-row"><div><span class="section-kicker">Path finder</span><h3>Truy vấn đa chặng</h3></div></div><div class="col2"><label>Thực thể bắt đầu<input id="kb-start" value="Đái tháo đường"></label><label>Thực thể đích<input id="kb-end" value="Bệnh thận do đái tháo đường"></label></div><div class="actions top-gap"><button class="btn primary" id="kb-path-go" type="button">Tìm đường đi<svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div><p id="kb-path-result" class="path-result"></p></div>
+          <div class="card"><div class="card-title-row"><div><span class="section-kicker">Session sources</span><h3>Bổ sung tài liệu tạm</h3></div></div><p class="small">Đọc trang HTTPS thuộc nguồn cho phép hoặc PDF văn bản tối đa 3 MB. Tài liệu chỉ tồn tại trong phiên.</p><label>Địa chỉ trang nguồn<input id="kb-new-url" type="url" placeholder="https://www.who.int/..."></label><label class="file-control">Hoặc chọn PDF<input id="kb-new-pdf" type="file" accept=".pdf,application/pdf"></label><div class="actions top-gap"><button id="kb-ingest" type="button" class="btn primary">Đọc nguồn</button><button id="kb-clear-docs" type="button" class="btn ghost">Xóa tài liệu tạm</button></div><span id="kb-ingest-error" class="err"></span><div id="kb-session-sources" class="session-source-box"><span class="small">Chưa có tài liệu tạm.</span></div></div>
+        </div>
+        <div class="card"><div class="card-title-row"><div><span class="section-kicker">Provenance</span><h3>Nguồn tri thức có thể kiểm chứng</h3></div></div><div id="kb-reference-list" class="source-grid"></div></div>
+      </section>
+    </main>
   </div>
-  <div class="card hide" id="kb-result">
-    <h2>Câu trả lời có trích dẫn <span class="small">– offline, không phải LLM</span></h2>
-    <p id="kb-answer" class="answer"></p>
-    <h2 style="margin-top:16px">Bằng chứng được truy xuất</h2><div id="kb-snippets"></div>
-    <h2 style="margin-top:16px">Nguồn liên kết</h2><ol id="kb-sources" class="cite-list"></ol>
-    <h2 style="margin-top:16px">Đồ thị con liên quan</h2><div id="kb-subgraph" class="graph-wrap"></div>
-    <h2 style="margin-top:16px">Nhật ký các agent/công cụ</h2><div id="kb-trace" class="trace"></div>
-    <div id="kb-mas" class="well hide" style="margin-top:10px"></div>
-    <div id="kb-ml" class="well hide" style="margin-top:10px"></div>
-    <p class="disc">Chỉ số ML và câu trả lời KB là hai luồng khác nhau: ML dự đoán từ dữ liệu huấn luyện; KB/RAG cung cấp thông tin tham khảo có nguồn. Chúng không thay thế bác sĩ hoặc xét nghiệm xác nhận.</p>
-  </div>
-</section>
-<section id="p4" class="hide">
-  <div class="card">
-    <h2>Knowledge Base – mô hình đồ thị</h2>
-    <div class="pipes"><span>Web/PDF nguồn</span><b>→</b><span>Chuẩn hóa / trích entity</span><b>→</b><span>KB: nodes + edges + provenance</span><b>→</b><span>RAG/chatbot</span></div>
-    <div id="kb-stats" class="actions"></div>
-    <p id="neo4j-status" class="status"></p>
-    <div class="actions" style="margin-top:12px"><a class="btn ghost" href="/kb-diabetes/kb_diabetes.cypher" download>↓ File Neo4j Cypher</a><a class="btn ghost" href="/kb-diabetes/kb_diabetes.graphml" download>↓ File GraphML</a></div>
-    <p class="small">Mặc định website dùng NetworkX. File Cypher có thể nhập thủ công vào Neo4j; chỉ báo Neo4j "đã kết nối" khi có cấu hình và truy vấn thật thành công.</p>
-  </div>
-  <div class="card">
-    <h2>Trực quan hóa các thực thể và quan hệ</h2>
-    <label>Chọn thực thể trung tâm<select id="kb-focus"><option value="Đái tháo đường">Đái tháo đường</option></select></label>
-    <p class="small" id="kb-graph-count"></p>
-    <div id="kb-fullgraph" class="graph-wrap"></div>
-  </div>
-  <div class="card">
-    <h2>Truy vấn đa chặng (1–5 chặng)</h2>
-    <div class="col2"><label>Thực thể bắt đầu<input id="kb-start" value="Đái tháo đường"></label><label>Thực thể đích<input id="kb-end" value="Bệnh thận do đái tháo đường"></label></div>
-    <div class="actions" style="margin-top:10px"><button class="btn" id="kb-path-go" type="button">Tìm đường đi</button><span id="kb-path-result" class="small"></span></div>
-  </div>
-  <div class="card">
-    <h2>Nguồn của Knowledge Base (có thể kiểm chứng)</h2>
-    <div id="kb-reference-list"></div>
-  </div>
-  <div class="card">
-    <h2>Bổ sung tài liệu web/PDF cho phiên RAG</h2>
-    <p class="small">Để demo cách thêm nguồn, hệ thống nhận trang HTTPS thuộc WHO, NIDDK, CDC, Vinmec hoặc PDF có thể đọc text. Nguồn nhập được dùng tạm trong trình duyệt, <b>không lưu vĩnh viễn lên Neo4j/Render</b>. Các thực thể tự phát hiện chỉ có quan hệ <span class="mono">MENTIONS</span>, không tự coi là quan hệ y khoa đã kiểm chứng.</p>
-    <div class="col2">
-      <label>Địa chỉ trang nguồn HTTPS<input id="kb-new-url" type="url" placeholder="https://www.vinmec.com/vie/bai-viet/..."></label>
-      <label>Hoặc chọn PDF văn bản (tối đa 3 MB)<input id="kb-new-pdf" type="file" accept=".pdf,application/pdf"></label>
-    </div>
-    <div class="actions" style="margin:12px 0"><button id="kb-ingest" type="button" class="btn">Đọc và phân tích nguồn</button><button id="kb-clear-docs" type="button" class="btn ghost">Xóa tài liệu tạm</button><span id="kb-ingest-error" class="err"></span></div>
-    <div id="kb-session-sources" class="well"><span class="small">Chưa có tài liệu tạm. Có thể dùng luôn 7 nguồn KB được biên tập sẵn.</span></div>
-  </div>
-</section>
-</main>
+</div>
+
 <script>
 const $=id=>document.getElementById(id);
 let SCHEMA={};
@@ -172,49 +207,37 @@ const EX={common:{age:52,bmi:33.5,sex:"female"},pima:{Pregnancies:2,Glucose:150,
  brfss:{HighBP:1,HighChol:1,CholCheck:1,Smoker:0,Stroke:0,HeartDiseaseorAttack:0,PhysActivity:0,GenHlth:4,DiffWalk:0}};
 function field(g,f){
   const l=document.createElement('label');l.textContent=f.label+(f.required?' *':'');
-  let el;
-  if(f.kind==='select'){el=document.createElement('select');el.add(new Option('— chưa rõ —',''));f.options.forEach(o=>el.add(new Option(o[1],o[0])))}
-  else{el=document.createElement('input');el.type='number';el.inputMode='decimal';el.step=f.step||1;if(f.min!=null)el.min=f.min;if(f.max!=null)el.max=f.max}
-  el.dataset.g=g;el.dataset.n=f.name;if(f.required)el.required=true;l.appendChild(el);return l;
+  let input;
+  if(f.kind==='select'){input=document.createElement('select');input.add(new Option('— Chưa rõ —',''));f.options.forEach(o=>input.add(new Option(o[1],o[0])))}
+  else{input=document.createElement('input');input.type='number';input.inputMode='decimal';input.step=f.step||1;if(f.min!=null)input.min=f.min;if(f.max!=null)input.max=f.max;input.placeholder='Nhập giá trị'}
+  input.dataset.g=g;input.dataset.n=f.name;if(f.required)input.required=true;l.appendChild(input);return l;
 }
-function collect(){
-  const p={};document.querySelectorAll('[data-g]').forEach(e=>{if(e.value!==''){(p[e.dataset.g]??={})[e.dataset.n]=e.value}});return p;
-}
-function fill(d){
-  document.querySelectorAll('[data-g]').forEach(e=>{const v=(d[e.dataset.g]||{})[e.dataset.n];e.value=v==null?'':v});
-  ['pima','kaggle100k','brfss'].forEach(k=>$('d-'+k).open=!!Object.keys(d[k]||{}).length);
-}
-function card(r){
-  if(r.status!=='ok')return `<div class="agent"><h3>${r.label}</h3><span class="tag" style="background:var(--mute)">${r.status==='skipped'?'Bỏ qua':'Thiếu mô hình'}</span><p class="small">${r.reason||'Không tìm thấy file mô hình.'}</p></div>`;
-  const pct=(r.probability*100).toFixed(1),col=r.high_risk?'var(--bad)':'var(--ok)';
-  return `<div class="agent"><h3>${r.label}</h3><div class="pct" style="color:${col}">${pct}%</div>
-  <div class="bar"><i style="width:${Math.min(100,pct)}%;background:${col}"></i><b style="left:${r.threshold*100}%"></b></div>
-  <div class="small">Vạch đen = ngưỡng ${r.threshold.toFixed(2)} · mô hình ${r.model}</div>
-  <p><span class="tag" style="background:${col}">${r.high_risk?'NGUY CƠ CAO':'Thấp hơn ngưỡng'}</span></p>
-  <div class="small">${r.features_used}/${r.features_total} đặc trưng được cung cấp</div></div>`;
+function collect(){const p={};document.querySelectorAll('[data-g]').forEach(e=>{if(e.value!==''){(p[e.dataset.g]??={})[e.dataset.n]=e.value}});return p}
+function fill(d){document.querySelectorAll('[data-g]').forEach(e=>{const v=(d[e.dataset.g]||{})[e.dataset.n];e.value=v==null?'':v});['pima','kaggle100k','brfss'].forEach(k=>$('d-'+k).open=!!Object.keys(d[k]||{}).length)}
+function resultCard(r){
+  if(r.status!=='ok')return `<article class="agent-result unavailable"><div class="agent-result-top"><span class="agent-result-icon">—</span><div><h3>${r.label}</h3><p>Không tham gia hội đồng</p></div></div><span class="tag muted">${r.status==='skipped'?'THIẾU DỮ LIỆU':'THIẾU MÔ HÌNH'}</span><p class="small">${r.reason||'Không tìm thấy file mô hình.'}</p></article>`;
+  const pct=(r.probability*100).toFixed(1),level=r.high_risk?'high':'low',label=r.high_risk?'CẦN LƯU Ý':'DƯỚI NGƯỠNG';
+  return `<article class="agent-result ${level}"><div class="agent-result-top"><span class="agent-result-icon">${r.high_risk?'!':'✓'}</span><div><h3>${r.label}</h3><p>${r.model}</p></div><span class="tag">${label}</span></div><div class="probability-row"><div><strong>${pct}<small>%</small></strong><span>Xác suất ước tính</span></div><div class="mini-donut" style="--value:${pct}"><span></span></div></div><div class="bar"><i style="width:${Math.min(100,pct)}%"></i><b style="left:${r.threshold*100}%"></b></div><div class="bar-label"><span>0%</span><span>Ngưỡng ${(r.threshold*100).toFixed(0)}%</span><span>100%</span></div><p class="feature-count">${r.features_used}/${r.features_total} đặc trưng đã được cung cấp</p></article>`;
 }
 $('f').onsubmit=async e=>{
-  e.preventDefault();$('err').textContent='';$('go').disabled=true;
-  try{
-    const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collect())});
-    const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi máy chủ');
-    $('res').innerHTML=d.results.map(card).join('');
-    $('vote').textContent=d.votes_total?`Hội đồng: ${d.votes_high}/${d.votes_total} agent cảnh báo nguy cơ cao`:'Chưa agent nào đủ dữ liệu — hãy điền thêm thông tin.';
-    $('out').classList.remove('hide');$('out').scrollIntoView({behavior:'smooth'});
-  }catch(x){$('err').textContent=x.message}finally{$('go').disabled=false}
+  e.preventDefault();$('err').textContent='';$('go').disabled=true;$('go').classList.add('loading');
+  try{const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collect())});const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi máy chủ');$('res').innerHTML=d.results.map(resultCard).join('');$('vote').textContent=d.votes_total?`${d.votes_high}/${d.votes_total} tác tử phát hiện tín hiệu cần lưu ý`:'Chưa tác tử nào đủ dữ liệu để đánh giá';$('out').classList.remove('hide');$('out').scrollIntoView({behavior:'smooth',block:'start'})}catch(x){$('err').textContent=x.message}finally{$('go').disabled=false;$('go').classList.remove('loading')}
 };
 $('ex').onclick=()=>fill(EX);$('rs').onclick=()=>{fill({});$('out').classList.add('hide')};
-function tab(n){[1,2,3,4].forEach(i=>{$('p'+i).classList.toggle('hide',n!==i);$('t'+i).classList.toggle('on',n===i)});if(n===2)loadReport();if(n===4&&window.loadKbGraph)window.loadKbGraph()}
+const TAB_HASH={1:'assessment',2:'research',3:'chat',4:'knowledge-graph'};
+const HASH_TAB={assessment:1,research:2,chat:3,'knowledge-graph':4};
+function tab(n,updateHash=true){
+  [1,2,3,4].forEach(i=>{$('p'+i).classList.toggle('hide',n!==i);$('t'+i).classList.toggle('on',n===i);$('t'+i).setAttribute('aria-current',n===i?'page':'false')});
+  const active=$('t'+n);$('view-title').textContent=active.dataset.title;$('view-subtitle').textContent=active.dataset.subtitle;
+  if(updateHash)history.replaceState(null,'','#'+TAB_HASH[n]);
+  window.scrollTo({top:0,behavior:'smooth'});if(n===2)loadReport();if(n===4&&window.loadKbGraph)window.loadKbGraph();
+}
 $('t1').onclick=()=>tab(1);$('t2').onclick=()=>tab(2);$('t3').onclick=()=>tab(3);$('t4').onclick=()=>tab(4);
 let rep=false;
-async function loadReport(){
-  if(rep)return;rep=true;const d=await (await fetch('/api/report')).json();
-  const cols=[['ds','Dataset'],['best','Mô hình'],['auc','AUC'],['recall','Recall'],['specificity','Specificity'],['precision','Precision'],['f2','F2'],['ece','ECE']];
-  $('tbl').innerHTML='<tr>'+cols.map(c=>`<th>${c[1]}</th>`).join('')+'</tr>'+d.metrics.map(m=>'<tr>'+cols.map(c=>`<td>${typeof m[c[0]]==='number'?m[c[0]].toFixed(3):m[c[0]]}</td>`).join('')+'</tr>').join('');
-  $('figs').innerHTML=d.figures.map(f=>`<a href="/figures/${f}" target="_blank"><img loading="lazy" src="/figures/${f}" alt="${f}"></a>`).join('')||'<p class="small">Chưa có biểu đồ — chạy python main.py.</p>';
-}
-(async()=>{const d=await (await fetch('/api/schema')).json();SCHEMA=d.schema;
-  for(const g in SCHEMA){const box=$('g-'+g);SCHEMA[g].forEach(f=>box.appendChild(field(g,f)))}})();
+async function loadReport(){if(rep)return;rep=true;const d=await (await fetch('/api/report')).json();const cols=[['ds','Dataset'],['best','Mô hình'],['auc','AUC'],['recall','Recall'],['specificity','Specificity'],['precision','Precision'],['f2','F2'],['ece','ECE']];$('tbl').innerHTML='<thead><tr>'+cols.map(c=>`<th>${c[1]}</th>`).join('')+'</tr></thead><tbody>'+d.metrics.map(m=>'<tr>'+cols.map(c=>`<td>${typeof m[c[0]]==='number'?m[c[0]].toFixed(3):m[c[0]]}</td>`).join('')+'</tr>').join('')+'</tbody>';$('figs').innerHTML=d.figures.map(f=>`<a href="/figures/${f}" target="_blank" rel="noopener"><img loading="lazy" src="/figures/${f}" alt="Biểu đồ ${f}"><span>Xem biểu đồ</span></a>`).join('')||'<p class="small">Chưa có biểu đồ — chạy python main.py.</p>'}
+(async()=>{const d=await (await fetch('/api/schema')).json();SCHEMA=d.schema;for(const g in SCHEMA){const box=$('g-'+g);SCHEMA[g].forEach(f=>box.appendChild(field(g,f)))}})();
+const initialTab=HASH_TAB[location.hash.slice(1)];if(initialTab)tab(initialTab,false);
+window.addEventListener('hashchange',()=>{const n=HASH_TAB[location.hash.slice(1)];if(n)tab(n,false)});
 </script>
 <script src="/static/kb.js" defer></script>
 </body>

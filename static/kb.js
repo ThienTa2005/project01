@@ -8,6 +8,41 @@
     if(css)node.className=css;parent.appendChild(node);return node;
   }
   function clear(node){while(node.firstChild)node.removeChild(node.firstChild)}
+  function nowLabel(){
+    return new Intl.DateTimeFormat('vi-VN',{hour:'2-digit',minute:'2-digit'}).format(new Date());
+  }
+  function scrollChat(){
+    const box=el('kb-chat-messages');if(box)requestAnimationFrame(()=>{box.scrollTop=box.scrollHeight});
+  }
+  function chatBubble(role, content, note=''){
+    const box=el('kb-chat-messages');if(!box)return null;
+    const row=document.createElement('div');
+    row.className='message-row '+(role==='user'?'user-message':'assistant-message');
+    if(role==='error')row.className='message-row assistant-message error-message';
+    if(role!=='user'){
+      const avatar=document.createElement('div');avatar.className='message-avatar';
+      avatar.innerHTML='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 11h16a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4Z"/><path d="M16 5v6M10 19h.01M16 19h.01M22 19h.01"/></svg>';
+      row.appendChild(avatar);
+    }
+    const stack=document.createElement('div');stack.className='message-stack';
+    const meta=document.createElement('div');meta.className='message-meta';
+    lineText(meta,'b',role==='user'?'Bạn':'DiaBot');lineText(meta,'span',nowLabel());
+    const bubble=document.createElement('div');bubble.className='message-bubble';
+    lineText(bubble,'p',content);
+    if(note)lineText(bubble,'small',note,'message-note');
+    stack.append(meta,bubble);row.appendChild(stack);box.appendChild(row);scrollChat();return row;
+  }
+  function showTyping(){
+    const box=el('kb-chat-messages');if(!box)return null;
+    const row=document.createElement('div');row.className='message-row assistant-message';row.id='kb-typing';
+    const avatar=document.createElement('div');avatar.className='message-avatar';
+    avatar.innerHTML='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 11h16a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4Z"/><path d="M16 5v6M10 19h.01M16 19h.01M22 19h.01"/></svg>';
+    const stack=document.createElement('div');stack.className='message-stack';
+    const meta=document.createElement('div');meta.className='message-meta';lineText(meta,'b','DiaBot');lineText(meta,'span','đang truy xuất tri thức…');
+    const bubble=document.createElement('div');bubble.className='message-bubble typing-bubble';
+    for(let i=0;i<3;i++)bubble.appendChild(document.createElement('i'));
+    stack.append(meta,bubble);row.append(avatar,stack);box.appendChild(row);scrollChat();return row;
+  }
   async function api(url, options={}){
     const r=await fetch(url,options); const d=await r.json();
     if(!r.ok)throw new Error(d.error || `Lỗi HTTP ${r.status}`);return d;
@@ -51,7 +86,8 @@
     const d=await api('/api/kb');
     const info=el('kb-stats');clear(info);
     [['Thực thể',d.stats.entities],['Quan hệ',d.stats.relations],['Nguồn',d.stats.sources]].forEach(([n,v])=>{
-      const span=lineText(info,'span',`${n}: ${v}`,'pill');span.style.fontSize='13px';
+      const card=document.createElement('div');card.className='metric-stat';
+      lineText(card,'strong',v);lineText(card,'span',n);info.appendChild(card);
     });
     const sources=el('kb-reference-list');clear(sources);
     d.sources.forEach(s=>{
@@ -62,6 +98,8 @@
     el('neo4j-status').textContent=status.connected
       ?`Neo4j đã kết nối: ${status.entity_nodes} thực thể / ${status.relationships} quan hệ (database).`
       :`Neo4j chưa hoạt động trên server; dùng NetworkX. ${status.note||''}`;
+    el('neo4j-status').classList.toggle('success',!!status.connected);
+    el('neo4j-status').classList.toggle('neutral',!status.connected);
   }
   async function loadKbGraph(){
     if(!KB_GRAPH){KB_GRAPH=await api('/api/kb/graph');
@@ -84,12 +122,27 @@
     el('kb-path-result').textContent=d.found?`${d.hops} chặng: ${d.path.join(' → ')}`:d.reason;
     if(d.found)graphView(el('kb-fullgraph'),d.edges,'',10);
   };
-  el('kb-example').onclick=()=>{el('kb-q').value='Vì sao đái tháo đường gây biến chứng thận, cần kiểm tra gì?'};
+  function setQuestion(question){
+    const input=el('kb-q');input.value=question;input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';input.focus();
+  }
+  document.querySelectorAll('[data-chat-example]').forEach(button=>{
+    button.addEventListener('click',()=>setQuestion(button.dataset.chatExample));
+  });
+  el('kb-example').onclick=()=>setQuestion('Vì sao đái tháo đường gây biến chứng thận, cần kiểm tra gì?');
+  el('kb-q').addEventListener('input',event=>{
+    event.target.style.height='auto';event.target.style.height=Math.min(event.target.scrollHeight,120)+'px';
+  });
+  el('kb-q').addEventListener('keydown',event=>{
+    if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();el('kb-go').click()}
+  });
   el('kb-go').onclick=async()=>{
-    el('kb-error').textContent='';const btn=el('kb-go');btn.disabled=true;
+    el('kb-error').textContent='';const btn=el('kb-go');
+    const question=el('kb-q').value.trim();
+    if(!question){el('kb-error').textContent='Hãy nhập câu hỏi trước khi gửi.';el('kb-q').focus();return}
+    btn.disabled=true;chatBubble('user',question);el('kb-q').value='';el('kb-q').style.height='auto';showTyping();
     try{
       const include=el('kb-include-patient').checked;
-      const body={question:el('kb-q').value,method:el('kb-method').value,top_k:Number(el('kb-topk').value),
+      const body={question,method:el('kb-method').value,top_k:Number(el('kb-topk').value),
           hops:Number(el('kb-hops').value),alpha:Number(el('kb-alpha').value),
           extra_documents:EXTRA,include_patient:include,patient:include?collect():null,
           history:CHAT_HISTORY.slice(-6)};
@@ -97,6 +150,8 @@
       CHAT_HISTORY.push({role:'user',content:body.question},{role:'assistant',content:d.answer});
       CHAT_HISTORY=CHAT_HISTORY.slice(-12);
       const context=d.context_used?' · đã hiểu theo câu hỏi trước':'';
+      el('kb-typing')?.remove();
+      chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'NetworkX'} · ${d.intent||'general'}`);
       el('kb-answer').textContent=d.answer+'\n\n(Ý định: '+(d.intent||'general')+context+' · KG backend: '+(d.graph_backend||'NetworkX')+')';
       const sn=el('kb-snippets');clear(sn);
       d.snippets.forEach(s=>{const w=document.createElement('div');w.className='well';w.style.margin='6px 0';
@@ -125,8 +180,12 @@
         lineText(ml,'p',`${d.ml_prediction.votes_high}/${d.ml_prediction.votes_total} agent cảnh báo nguy cơ cao. Đây là đánh giá thuật toán, không chẩn đoán.`);
         d.ml_prediction.results.forEach(r=>lineText(ml,'div',`${r.label}: ${r.status==='ok'?(r.probability*100).toFixed(1)+'%':r.reason||r.status}`,'small'));
       }else ml.classList.add('hide');
-      el('kb-result').classList.remove('hide');el('kb-result').scrollIntoView({behavior:'smooth'});
-    }catch(err){el('kb-error').textContent=err.message}finally{btn.disabled=false}
+      el('kb-empty-insight')?.classList.add('hide');
+      el('kb-result').classList.remove('hide');
+    }catch(err){
+      el('kb-typing')?.remove();el('kb-error').textContent=err.message;chatBubble('error','Xin lỗi, tôi chưa thể xử lý câu hỏi này. '+err.message);
+      setQuestion(question);
+    }finally{el('kb-typing')?.remove();btn.disabled=false}
   };
   function showSession(){
     const box=el('kb-session-sources');clear(box);
