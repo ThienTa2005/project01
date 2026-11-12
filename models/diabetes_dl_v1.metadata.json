@@ -1,0 +1,59 @@
+{
+  "thr": 0.16361232667495998,
+  "features": [
+    "gender",
+    "age",
+    "hypertension",
+    "heart_disease",
+    "smoking_history",
+    "bmi",
+    "hbA1c_level",
+    "blood_glucose_level"
+  ],
+  "num": [
+    "age",
+    "hypertension",
+    "heart_disease",
+    "bmi",
+    "hbA1c_level",
+    "blood_glucose_level"
+  ],
+  "cat": [
+    "gender",
+    "smoking_history"
+  ],
+  "model_version": "diabetes-mlp-v1.0",
+  "model_architecture": "Feed-forward MLP: 8 inputs -> one-hot/scale -> Dense(64, ReLU) -> Dense(32, ReLU) -> sigmoid probability",
+  "training_dataset": "Diabetes Prediction 100k (deduplicated; year/location/race excluded)",
+  "preprocessing": "Median imputation + StandardScaler for numeric fields; most-frequent imputation + one-hot encoding for categorical fields",
+  "output_format": {
+    "score": "P(class=1)",
+    "prediction": "score >= validation-selected F2 threshold"
+  },
+  "metrics": {
+    "auc": 0.9755998405483082,
+    "pr_auc": 0.874877789852892,
+    "brier": 0.02343342523887565,
+    "ece": 0.003742185723470715,
+    "threshold": 0.16361232667495998,
+    "accuracy": 0.9485948594859486,
+    "balanced_accuracy": 0.8876031453132133,
+    "precision": 0.6603053435114504,
+    "recall": 0.8141176470588235,
+    "specificity": 0.961088643567603,
+    "f1": 0.7291886195995785,
+    "f2": 0.7778776978417267,
+    "tn": 17586,
+    "fp": 712,
+    "fn": 316,
+    "tp": 1384,
+    "validation_auc": 0.9775600421545856,
+    "test_rows": 19998,
+    "train_rows": 63990,
+    "validation_rows": 15998,
+    "network_iterations": 47
+  },
+  "trained_on": "2026-11-12",
+  "random_seed": 42,
+  "clinical_validation": false
+}

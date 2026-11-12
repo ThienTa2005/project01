@@ -1,0 +1,452 @@
+{
+  "description": "KB học thuật xây từ dữ kiện kiểm chứng, không tự thu thập toàn văn; mỗi quan hệ gắn nguồn và diễn giải.",
+  "sources": [
+    {
+      "id": "WHO-01",
+      "title": "WHO – Diabetes",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/diabetes",
+      "published_at": "2026-11-03",
+      "summary": "Tổng quan về đái tháo đường, triệu chứng, biến chứng, phòng ngừa và điều trị.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "NIDDK-01",
+      "title": "NIDDK – Diabetes Tests & Diagnosis",
+      "publisher": "NIDDK / NIH",
+      "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+      "published_at": null,
+      "summary": "Ngưỡng HbA1c và glucose, nguyên tắc xác nhận xét nghiệm chẩn đoán.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "NIDDK-02",
+      "title": "NIDDK – The A1C Test & Diabetes",
+      "publisher": "NIDDK / NIH",
+      "url": "https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test",
+      "published_at": null,
+      "summary": "HbA1c phản ánh mức glucose trung bình xấp xỉ ba tháng.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "CDC-01",
+      "title": "CDC – Symptoms of Diabetes",
+      "publisher": "US CDC",
+      "url": "https://www.cdc.gov/diabetes/signs-symptoms/",
+      "published_at": "2024-05-15",
+      "summary": "Các dấu hiệu tiểu đường có thể nhận biết.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "CDC-02",
+      "title": "CDC – Type 2 Diabetes",
+      "publisher": "US CDC",
+      "url": "https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html",
+      "published_at": "2024-05-15",
+      "summary": "Yếu tố nguy cơ và lối sống liên quan đái tháo đường típ 2.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "VIN-01",
+      "title": "Vinmec – Dấu hiệu sớm báo hiệu bệnh tiểu đường",
+      "publisher": "Vinmec",
+      "url": "https://www.vinmec.com/vie/bai-viet/dau-hieu-som-bao-hieu-benh-tieu-duong-vi",
+      "published_at": "2026-09-07",
+      "summary": "Tổng hợp các dấu hiệu gợi ý và thời điểm nên tầm soát.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    },
+    {
+      "id": "VIN-02",
+      "title": "Vinmec – Các biến chứng mãn tính của bệnh tiểu đường",
+      "publisher": "Vinmec",
+      "url": "https://www.vinmec.com/vie/bai-viet/cac-bien-chung-man-tinh-cua-benh-tieu-duong-vi",
+      "published_at": "2024-07-22",
+      "summary": "Biến chứng về võng mạc, thận, thần kinh và mạch máu.",
+      "kind": "curated",
+      "curation": "Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.",
+      "checked_at": "2026-11-06"
+    }
+  ],
+  "facts": [
+    {
+      "id": "F001",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Khát nhiều",
+      "source_id": "CDC-01",
+      "evidence": "Khát nước nhiều là một trong các dấu hiệu thường gặp của bệnh đái tháo đường."
+    },
+    {
+      "id": "F002",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Tiểu nhiều",
+      "source_id": "CDC-01",
+      "evidence": "Đi tiểu thường xuyên là dấu hiệu có thể gặp ở người mắc đái tháo đường."
+    },
+    {
+      "id": "F003",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Mệt mỏi",
+      "source_id": "CDC-01",
+      "evidence": "Người mắc đái tháo đường có thể xuất hiện tình trạng mệt mỏi."
+    },
+    {
+      "id": "F004",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Nhìn mờ",
+      "source_id": "CDC-01",
+      "evidence": "Nhìn mờ có thể là triệu chứng của tăng đường huyết."
+    },
+    {
+      "id": "F005",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Sụt cân không chủ ý",
+      "source_id": "WHO-01",
+      "evidence": "Sụt cân không chủ ý có thể xuất hiện ở một số người mắc đái tháo đường."
+    },
+    {
+      "id": "F006",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_SYMPTOM",
+      "object": "Vết thương chậm lành",
+      "source_id": "VIN-01",
+      "evidence": "Vết thương lâu lành là dấu hiệu cần lưu ý khi đánh giá bệnh đái tháo đường."
+    },
+    {
+      "id": "F007",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "HAS_RISK_FACTOR",
+      "object": "Thừa cân hoặc béo phì",
+      "source_id": "CDC-02",
+      "evidence": "Thừa cân hoặc béo phì làm tăng nguy cơ mắc đái tháo đường típ 2."
+    },
+    {
+      "id": "F008",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "HAS_RISK_FACTOR",
+      "object": "Ít vận động",
+      "source_id": "CDC-02",
+      "evidence": "Hoạt động thể chất không đủ là một yếu tố nguy cơ của đái tháo đường típ 2."
+    },
+    {
+      "id": "F009",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "HAS_RISK_FACTOR",
+      "object": "Tiền sử gia đình",
+      "source_id": "CDC-02",
+      "evidence": "Có người thân bậc một mắc đái tháo đường típ 2 làm tăng nguy cơ mắc bệnh."
+    },
+    {
+      "id": "F010",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "HAS_RISK_FACTOR",
+      "object": "Tiền sử đái tháo đường thai kỳ",
+      "source_id": "CDC-02",
+      "evidence": "Tiền sử đái tháo đường thai kỳ có liên quan tăng nguy cơ mắc đái tháo đường típ 2."
+    },
+    {
+      "id": "F011",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_COMPLICATION",
+      "object": "Bệnh thận do đái tháo đường",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường kéo dài có thể gây tổn thương thận."
+    },
+    {
+      "id": "F012",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_COMPLICATION",
+      "object": "Tổn thương võng mạc",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường có thể gây tổn thương mạch máu võng mạc và ảnh hưởng thị lực."
+    },
+    {
+      "id": "F013",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_COMPLICATION",
+      "object": "Tổn thương thần kinh",
+      "source_id": "WHO-01",
+      "evidence": "Đường huyết cao kéo dài có thể gây tổn thương hệ thần kinh."
+    },
+    {
+      "id": "F014",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_COMPLICATION",
+      "object": "Bệnh tim mạch",
+      "source_id": "WHO-01",
+      "evidence": "Người mắc đái tháo đường có nguy cơ biến cố tim mạch cao hơn."
+    },
+    {
+      "id": "F015",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_COMPLICATION",
+      "object": "Loét bàn chân",
+      "source_id": "WHO-01",
+      "evidence": "Tổn thương thần kinh và tuần hoàn kém có thể gây loét bàn chân ở người đái tháo đường."
+    },
+    {
+      "id": "F016",
+      "subject": "Đái tháo đường",
+      "predicate": "ASSESSED_WITH",
+      "object": "HbA1c",
+      "source_id": "NIDDK-01",
+      "evidence": "Xét nghiệm HbA1c có thể được sử dụng trong sàng lọc và chẩn đoán đái tháo đường."
+    },
+    {
+      "id": "F017",
+      "subject": "Đái tháo đường",
+      "predicate": "ASSESSED_WITH",
+      "object": "Đường huyết lúc đói",
+      "source_id": "NIDDK-01",
+      "evidence": "Xét nghiệm glucose huyết tương lúc đói được dùng để phát hiện đái tháo đường."
+    },
+    {
+      "id": "F018",
+      "subject": "Đái tháo đường",
+      "predicate": "ASSESSED_WITH",
+      "object": "Nghiệm pháp dung nạp glucose",
+      "source_id": "NIDDK-01",
+      "evidence": "Nghiệm pháp dung nạp glucose đường uống là một xét nghiệm chẩn đoán đái tháo đường."
+    },
+    {
+      "id": "F019",
+      "subject": "HbA1c",
+      "predicate": "REFLECTS",
+      "object": "Đường huyết trung bình khoảng 3 tháng",
+      "source_id": "NIDDK-02",
+      "evidence": "HbA1c phản ánh mức glucose trung bình trong khoảng ba tháng trước thời điểm xét nghiệm."
+    },
+    {
+      "id": "F020",
+      "subject": "HbA1c",
+      "predicate": "HAS_PREDIABETES_RANGE",
+      "object": "5,7%–6,4%",
+      "source_id": "NIDDK-01",
+      "evidence": "HbA1c từ 5,7% đến 6,4% nằm trong khoảng tiền đái tháo đường."
+    },
+    {
+      "id": "F021",
+      "subject": "HbA1c",
+      "predicate": "HAS_DIABETES_THRESHOLD",
+      "object": "Từ 6,5%",
+      "source_id": "NIDDK-01",
+      "evidence": "HbA1c từ 6,5% có thể thuộc ngưỡng chẩn đoán đái tháo đường và thường cần xét nghiệm xác nhận."
+    },
+    {
+      "id": "F022",
+      "subject": "Đường huyết lúc đói",
+      "predicate": "HAS_DIABETES_THRESHOLD",
+      "object": "Từ 126 mg/dL",
+      "source_id": "NIDDK-01",
+      "evidence": "Glucose huyết tương lúc đói từ 126 mg/dL là một ngưỡng chẩn đoán đái tháo đường; thông thường cần xác nhận."
+    },
+    {
+      "id": "F023",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Vận động thể chất",
+      "source_id": "WHO-01",
+      "evidence": "Hoạt động thể chất đều đặn có thể giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2."
+    },
+    {
+      "id": "F024",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Dinh dưỡng lành mạnh",
+      "source_id": "WHO-01",
+      "evidence": "Chế độ ăn lành mạnh giúp giảm nguy cơ mắc đái tháo đường típ 2."
+    },
+    {
+      "id": "F025",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Duy trì cân nặng phù hợp",
+      "source_id": "WHO-01",
+      "evidence": "Duy trì cân nặng phù hợp giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2."
+    },
+    {
+      "id": "F026",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Không hút thuốc lá",
+      "source_id": "WHO-01",
+      "evidence": "Tránh hút thuốc lá là một phần trong chiến lược phòng ngừa đái tháo đường típ 2."
+    },
+    {
+      "id": "F027",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "CAN_BE_TREATED_WITH",
+      "object": "Metformin",
+      "source_id": "WHO-01",
+      "evidence": "Metformin là một trong các nhóm thuốc được sử dụng điều trị đái tháo đường típ 2 theo chỉ định của bác sĩ."
+    },
+    {
+      "id": "F028",
+      "subject": "Đái tháo đường típ 1",
+      "predicate": "REQUIRES",
+      "object": "Insulin",
+      "source_id": "WHO-01",
+      "evidence": "Người mắc đái tháo đường típ 1 cần insulin để duy trì sự sống."
+    },
+    {
+      "id": "F029",
+      "subject": "Đái tháo đường",
+      "predicate": "RELATED_TO",
+      "object": "Đường huyết tăng",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường gắn với tình trạng glucose huyết tăng cao kéo dài."
+    },
+    {
+      "id": "F030",
+      "subject": "Đường huyết tăng",
+      "predicate": "CAN_DAMAGE",
+      "object": "Thận",
+      "source_id": "WHO-01",
+      "evidence": "Đường huyết cao lâu ngày có thể gây tổn thương thận."
+    },
+    {
+      "id": "F031",
+      "subject": "Thận",
+      "predicate": "RELATED_TO",
+      "object": "Bệnh thận do đái tháo đường",
+      "source_id": "VIN-02",
+      "evidence": "Bệnh thận do đái tháo đường là một biến chứng vi mạch quan trọng."
+    },
+    {
+      "id": "F032",
+      "subject": "Đường huyết tăng",
+      "predicate": "CAN_DAMAGE",
+      "object": "Võng mạc",
+      "source_id": "VIN-02",
+      "evidence": "Đường huyết cao kéo dài có thể làm tổn thương võng mạc."
+    },
+    {
+      "id": "F033",
+      "subject": "Đường huyết tăng",
+      "predicate": "CAN_DAMAGE",
+      "object": "Dây thần kinh",
+      "source_id": "VIN-02",
+      "evidence": "Đường huyết cao kéo dài có thể gây bệnh lý thần kinh."
+    },
+    {
+      "id": "F034",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_TYPE",
+      "object": "Đái tháo đường típ 1",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường típ 1 có đặc điểm thiếu insulin và cần điều trị insulin."
+    },
+    {
+      "id": "F035",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_TYPE",
+      "object": "Đái tháo đường típ 2",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường típ 2 liên quan việc cơ thể sử dụng insulin không hiệu quả."
+    },
+    {
+      "id": "F036",
+      "subject": "Đái tháo đường",
+      "predicate": "HAS_TYPE",
+      "object": "Đái tháo đường thai kỳ",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường thai kỳ là tăng đường huyết xuất hiện trong giai đoạn thai kỳ."
+    },
+    {
+      "id": "F037",
+      "subject": "Insulin",
+      "predicate": "IS_A",
+      "object": "Hormone điều hòa đường huyết",
+      "source_id": "WHO-01",
+      "evidence": "Insulin là một hormone có vai trò điều hòa glucose trong máu."
+    },
+    {
+      "id": "F038",
+      "subject": "Insulin",
+      "predicate": "PRODUCED_BY",
+      "object": "Tuyến tụy",
+      "source_id": "CDC-02",
+      "evidence": "Insulin là hormone được tuyến tụy sản xuất và giúp đưa đường trong máu vào tế bào để sử dụng làm năng lượng."
+    },
+    {
+      "id": "F039",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "RELATED_TO",
+      "object": "Kháng insulin",
+      "source_id": "CDC-02",
+      "evidence": "Trong đái tháo đường típ 2, tế bào không đáp ứng bình thường với insulin; tình trạng này được gọi là kháng insulin."
+    },
+    {
+      "id": "F040",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Ít nhất 150 phút vận động vừa mỗi tuần",
+      "source_id": "WHO-01",
+      "evidence": "WHO khuyến nghị duy trì ít nhất 150 phút hoạt động thể chất mức độ vừa mỗi tuần để góp phần phòng ngừa đái tháo đường típ 2."
+    },
+    {
+      "id": "F041",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "PREVENTION",
+      "object": "Hạn chế đường và chất béo bão hòa",
+      "source_id": "WHO-01",
+      "evidence": "Một chế độ ăn lành mạnh và hạn chế đường cùng chất béo bão hòa là một phần của phòng ngừa đái tháo đường típ 2."
+    },
+    {
+      "id": "F042",
+      "subject": "Đái tháo đường",
+      "predicate": "CAN_BE_TREATED_WITH",
+      "object": "Lối sống lành mạnh",
+      "source_id": "WHO-01",
+      "evidence": "Đái tháo đường có thể được điều trị và quản lý bằng chế độ ăn, hoạt động thể chất và thuốc phù hợp."
+    },
+    {
+      "id": "F043",
+      "subject": "Đái tháo đường típ 2",
+      "predicate": "CAN_BE_TREATED_WITH",
+      "object": "Insulin hoặc thuốc hạ đường huyết",
+      "source_id": "WHO-01",
+      "evidence": "Một số người mắc đái tháo đường típ 2 cần insulin hoặc thuốc khác để kiểm soát đường huyết theo chỉ định chuyên môn."
+    },
+    {
+      "id": "F044",
+      "subject": "Đái tháo đường",
+      "predicate": "ASSESSED_WITH",
+      "object": "Xét nghiệm máu tại cơ sở y tế",
+      "source_id": "NIDDK-01",
+      "evidence": "Đái tháo đường và tiền đái tháo đường được chẩn đoán bằng xét nghiệm máu do nhân viên y tế đánh giá."
+    },
+    {
+      "id": "F045",
+      "subject": "Máy đo đường huyết tại nhà",
+      "predicate": "NOT_SUFFICIENT_FOR_DIAGNOSIS",
+      "object": "Đái tháo đường",
+      "source_id": "NIDDK-01",
+      "evidence": "Máy đo đường huyết mua không cần đơn không thể tự xác lập chẩn đoán đái tháo đường; kết quả cần được cơ sở y tế đánh giá."
+    },
+    {
+      "id": "F046",
+      "subject": "Đái tháo đường",
+      "predicate": "REQUIRES",
+      "object": "Theo dõi biến chứng định kỳ",
+      "source_id": "WHO-01",
+      "evidence": "Sàng lọc biến chứng thường xuyên và điều trị kịp thời giúp hạn chế hậu quả của đái tháo đường."
+    }
+  ]
+}

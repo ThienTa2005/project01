@@ -1,0 +1,229 @@
+﻿GIẢI ĐÁP CÁC YÊU CẦU TRÊN BẢNG – DEMO PROJECT01
+================================================
+Dự án: HỆ ĐA AGENT DỰ ĐOÁN ĐÁI THÁO ĐƯỜNG + KNOWLEDGE GRAPH + RAG
+Bản kiểm tra thực tế trong workspace, 06/11/2026.
+
+I. ĐỌC VÀ DIỄN GIẢI ẢNH CHỤP BẢNG
+---------------------------------
+Ảnh có hai mục. Mục 1 ghi “Knowledge Graph – neo4j”, nguồn “web + image + pdf” -> “KB”, “KB chatbot lưu ở đâu?”, “code RAG + link DB?”. Mục 2 vẽ “DB (dataset) -> DL”.
+
+Đối chiếu từng ý với project hiện tại:
+- “Web/PDF -> KB”: ĐÃ CÓ và chạy được. Web chỉ nhận các tên miền y khoa cho phép; PDF phải có lớp text. Nguồn mới chỉ tự sinh MENTIONS, không tự bịa quan hệ y khoa.
+- “Image -> KB”: CHƯA CÓ OCR. Không được nói hệ thống đã đọc ảnh/PDF scan. Muốn hoàn thành phải thêm một OCR engine có thể triển khai và kiểm thử tiếng Việt/Anh; hiện tại ảnh chỉ là phần chưa triển khai.
+- “Show KB Neo4j”: ĐÃ CÓ file Cypher, GraphML, script sync và runtime đọc Neo4j; nhưng CHƯA THỂ KHẲNG ĐỊNH Neo4j thật đang chạy nếu chưa cấu hình NEO4J_URI/credentials và sync dữ liệu. Mặc định dùng NetworkX.
+- “KB chatbot lưu ở đâu?”: Fact và metadata nguồn lưu ở knowledge/seed.json (và knowledge/extra_sources.json nếu nhập bền vững); graph mặc định dựng trong RAM bằng NetworkX; có thể đồng bộ sang Neo4j. Chatbot không lưu lịch sử hội thoại server-side. Tài liệu người dùng tải trên web chỉ nằm ở biến JavaScript của phiên trang và được gửi kèm request RAG.
+- “Code RAG + link DB?”: ĐÃ CÓ. knowledge/engine.py thực hiện Vector/Graph/Hybrid retrieval; knowledge/neo4j_store.py đọc cạnh Neo4j bằng truy vấn có tham số; knowledge/assistant.py điều phối; app.py cung cấp API.
+- “DB (dataset) -> DL”: Dữ liệu -> pipeline HUẤN LUYỆN đã có, nhưng đó là Machine Learning cổ điển (Logistic Regression, Random Forest, HistGradientBoosting), KHÔNG phải Deep Learning. Nếu chữ “DL” trên bảng có nghĩa Deep Learning thì project chưa có CNN/MLP/TensorFlow/PyTorch và không được trình bày là đã có.
+
+KẾT LUẬN KIỂM TRA: project đã trả lời tốt phần KG + RAG + chatbot + pipeline ML, nhưng chỉ hoàn thành một phần yêu cầu nếu giảng viên bắt buộc “image/OCR”, “Neo4j live” hoặc “Deep Learning”. Bản hiện tại minh bạch các giới hạn này, không đánh tráo NetworkX thành Neo4j, ML thành DL, hay PDF text thành OCR.
+
+Kiểm chứng đã chạy ngày 06/11/2026:
+- python -m scripts.build_kb: thành công; 46 thực thể, 46 quan hệ, 7 nguồn, 53 graph nodes.
+- python predict.py --input examples/patient_example.json: thành công; 3/3 agent trả kết quả, hội đồng biểu quyết.
+- python make_report.py: thành công.
+- pytest -q: 27 passed.
+- Các URL WHO, NIDDK/NIH, CDC và Vinmec chính trong seed.json mở được; ví dụ NIDDK xác nhận HbA1c từ 6,5% và thường cần xét nghiệm thứ hai để xác nhận.
+- Đã sửa lỗi mã hóa console khiến các CLI tiếng Việt trước đó kết thúc UnicodeEncodeError trên Windows.
+
+Các ý chính thầy muốn thấy là: tri thức đến từ đâu; được trích xuất và lưu thành graph như thế nào; Neo4j có dữ liệu thật hay chỉ là hình vẽ; RAG lấy tri thức trong KG bằng cách nào; chatbot và các agent xử lý yêu cầu ra sao; dữ liệu nào được dùng để HUẤN LUYỆN ML, dữ liệu nào chỉ dùng để TRUY XUẤT tri thức.
+
+II. PROJECT GỐC ĐÃ CÓ GÌ, THIẾU GÌ?
+-----------------------------------
+Có sẵn trong ZIP gốc:
+- 3 tác tử dự đoán dựa trên các mô hình học máy đã huấn luyện: Pima, Diabetes 100k, CDC BRFSS.
+- Huấn luyện/đánh giá mô hình bằng DataAgent, ModelAgent, EvaluatorAgent, Orchestrator, ComparatorAgent, ReporterAgent.
+- Giao diện Flask: nhập thông số, dự đoán từng mô hình, biểu quyết, bảng metrics và biểu đồ nghiên cứu.
+- Model lưu trong models/*.joblib; dữ liệu nghiên cứu ở data/; kết quả ở outputs/.
+
+
+
+III. NHỮNG GÌ ĐÃ BỔ SUNG TRONG BẢN NÀY
+--------------------------------------
+- knowledge/seed.json: 7 nguồn web xác minh được (WHO, NIDDK/NIH, CDC, Vinmec), 46 mệnh đề có nguồn rõ ràng. Đây là TRI THỨC BIÊN TẬP, không phải mô hình ML được huấn luyện bằng web đó.
+- knowledge/engine.py: đồ thị NetworkX gồm 46 thực thể, 46 quan hệ y khoa và cạnh provenance (SUPPORTS) từ nguồn -> thực thể; Vector RAG kết hợp TF-IDF từ/ký tự, mở rộng đồng nghĩa và ý định; GraphRAG duyệt entity và lân cận; Hybrid kết hợp điểm alpha.
+- knowledge/kb_diabetes.cypher: file MERGE node Entity/Source, cạnh quan hệ bệnh học và SUPPORTS.
+- knowledge/kb_diabetes.graphml: đồ thị để đọc bằng NetworkX/Gephi.
+- scripts/build_kb.py: dựng lại các file graph từ nguồn JSON.
+- scripts/ingest_source.py: nạp thêm trang web được cho phép hoặc PDF văn bản vào knowledge/extra_sources.json; sinh quan hệ MENTIONS từ document tới thực thể; sau đó build lại graph.
+- knowledge/ingest.py: đọc URL HTTPS thuộc WHO/NIDDK/CDC/Vinmec bằng requests/BeautifulSoup, đọc PDF bằng pypdf; chặn nguồn lạ, redirect, giới hạn dung lượng; không nhận PDF scan chưa OCR.
+- knowledge/assistant.py: QueryRouter + GraphQueryAgent + VectorSearchAgent + FusionAgent + AnswerAgent; tùy chọn ClinicalPredictorAgent để chạy dự đoán ba mô hình ML từ input người dùng.
+- Flask: thêm /api/kb, /api/kb/graph, /api/kb/path, /api/chat, /api/kb/ingest, /api/kb/neo4j và đường tải file graph.
+- Giao diện: thêm “KB + RAG Chatbot” và “Đồ thị Knowledge Graph”, xem nguồn, snippet, đồ thị con, nhật ký công cụ và download.
+- Ngưỡng hội đồng được trả về thành consensus: majority_high / majority_low / tie / insufficient_data.
+
+IV. TRẢ LỜI CÂU 1: “SHOW KB NEO4J” – KB NẰM Ở ĐÂU?
+---------------------------------------------------
+Hiện tại có hai cách:
+A. Mặc định không cần máy chủ database: Knowledge Graph chạy bằng NetworkX trong Python. Trên website vào “Đồ thị Knowledge Graph”, chọn thực thể và xem các cạnh; tải file knowledge/kb_diabetes.graphml.
+B. Dùng Neo4j thật: file knowledge/kb_diabetes.cypher được tạo sẵn và có script scripts/sync_neo4j.py để ghi node/edge vào Neo4j. Cần CẤU HÌNH Neo4j Aura/DB và credentials; nếu chưa cấu hình, KHÔNG được nói “web đang dùng Neo4j”. Khi đã cấu hình và sync, GraphQueryAgent ưu tiên truy vấn Neo4j trực tiếp (chỉ đọc); nếu lỗi/thiếu dữ liệu thì fallback NetworkX và hiển thị nhãn backend thực tế.
+
+Lệnh dựng file graph:
+  python -m scripts.build_kb
+
+Muốn đồng bộ một lần lên Neo4j (chạy trên máy cá nhân, không commit mật khẩu):
+  set NEO4J_URI=neo4j+s://...
+  set NEO4J_USER=neo4j
+  set NEO4J_PASSWORD=...
+  python -m scripts.sync_neo4j
+  (macOS/Linux dùng export thay vì set)
+
+Truy vấn trình chiếu trên Neo4j Browser:
+  MATCH (a:Entity)-[r]->(b:Entity)
+  WHERE a.id = 'Đái tháo đường'
+  RETURN a,r,b LIMIT 30;
+
+Truy vấn “nguồn nào hỗ trợ tri thức?”
+  MATCH (s:Source)-[r:SUPPORTS]->(e:Entity)
+  RETURN s,r,e LIMIT 20;
+
+Một ví dụ đường đi HAI CHẶNG (chạy được với NetworkX):
+  Đái tháo đường -> Đường huyết tăng -> Thận
+  Quan hệ lần lượt: RELATED_TO -> CAN_DAMAGE
+  Các cạnh đều có source_id để mở về WHO/Vinmec/NIDDK/CDC.
+
+V. TRẢ LỜI CÂU 2: “WEB + PDF -> GRAPH KNOWLEDGE / KB NEO4J”?
+-----------------------------------------------------------
+Luồng đúng là:
+ [Web WHO/NIDDK/CDC/Vinmec hoặc PDF]
+       -> tải / trích xuất text
+       -> làm sạch và tách đoạn
+       -> xác định tên thực thể theo ontology hiện có
+       -> kết nối Document -MENTIONS-> Entity
+       -> người biên tập kiểm tra các mệnh đề y khoa nếu muốn thêm quan hệ thật
+       -> lưu trong seed.json/extra_sources.json
+       -> xuất Cypher/GraphML, tùy chọn đồng bộ lên Neo4j
+       -> RAG dùng kho này làm căn cứ trả lời.
+
+Với 46 quan hệ y khoa dựng sẵn: nhóm đã tổng hợp thành các fact “Chủ thể – Quan hệ – Đối tượng – Diễn giải – Mã nguồn”, ví dụ:
+  Đái tháo đường --HAS_COMPLICATION--> Bệnh thận do đái tháo đường [WHO-01]
+  HbA1c --HAS_DIABETES_THRESHOLD--> Từ 6,5% [NIDDK-01]
+
+Lưu ý quan trọng: hệ thống KHÔNG dùng LLM tự động suy luận mọi quan hệ từ một trang/PDF bất kỳ. Với nguồn mới, công cụ chỉ trích quan hệ “MENTIONS” (nguồn NHẮC ĐẾN thực thể); muốn thêm quan hệ y khoa nhân quả/chống chỉ định phải được kiểm duyệt. Đây là cách tránh tạo tri thức sai.
+
+Demo thêm trang nguồn ở web: “Đồ thị Knowledge Graph” -> “Bổ sung tài liệu web/PDF cho phiên RAG” -> dán URL thuộc danh sách cho phép hoặc upload PDF có text -> “Đọc và phân tích nguồn”. Văn bản mới ở RAM/trình duyệt trong phiên đó, được gửi vào lần hỏi RAG tiếp theo, KHÔNG ghi vĩnh viễn vào Neo4j public.
+
+Muốn nhập và lưu THỰC SỰ vào repo/KB:
+  python -m scripts.ingest_source --url "https://www.vinmec.com/vie/bai-viet/dau-hieu-som-bao-hieu-benh-tieu-duong-vi"
+  python -m scripts.ingest_source --pdf "duong_dan/tai_lieu.pdf"
+  python -m scripts.build_kb
+  git add knowledge && git commit -m "add reviewed KB sources" && git push
+Chỉ chọn MỘT trong --url hoặc --pdf cho mỗi lần chạy. Hãy kiểm tra quyền sao chép/đăng công khai nội dung PDF trước khi commit extra_sources.json lên GitHub.
+
+VI. TRẢ LỜI CÂU 3: “TẬP HUẤN Ở ĐÂU?”
+------------------------------------
+Cần phân biệt hai hoạt động:
+
+A. HUẤN LUYỆN MÔ HÌNH ML (training):
+- Dữ liệu: data/diabetes.csv (Pima), data/diabetes_dataset.csv (Diabetes 100k), data/archive.zip (BRFSS 2015).
+- Khai báo: config.py -> DATASETS.
+- Bắt đầu: python main.py hoặc python main.py --fast.
+- Luồng: main.py -> Orchestrator -> DataAgent (đọc và chia train/test) -> ModelAgent (Logistic Regression, Random Forest, HistGradientBoosting; CV) -> EvaluatorAgent (đánh giá/yêu cầu chỉnh ngưỡng/huấn luyện lại) -> ComparatorAgent/ReporterAgent -> models/*.joblib + outputs/.
+- Giao diện Flask gọi models/*.joblib để dự đoán; KHÔNG huấn luyện lại mỗi lần người dùng nhập chỉ số.
+
+B. XÂY KHO TRI THỨC (KHÔNG phải training neural network):
+- Tài liệu WHO/NIDDK/CDC/Vinmec và PDF mới được đọc/trích thông tin.
+- Dữ kiện đã biên tập ở knowledge/seed.json; thêm nguồn ở knowledge/extra_sources.json.
+- scripts/build_kb.py tạo graph để phục vụ tìm kiếm và trả lời.
+- Không gọi đây là fine-tuning hay huấn luyện LLM. Một KB lưu các mệnh đề, không phải tập trọng số của mô hình.
+
+VII. TRẢ LỜI CÂU 4: “RAG <-> KB THẾ NÀO?”
+----------------------------------------
+Ví dụ câu hỏi: “HbA1c bao nhiêu là đái tháo đường?”
+  1. QueryRouter nhận câu hỏi và tham số method/top_k/hops/alpha.
+  2. VectorSearchAgent mã hóa câu hỏi và các chunk bằng TF-IDF ký tự; lấy các đoạn gần về chữ.
+  3. GraphQueryAgent tìm thực thể “HbA1c”; ưu tiên truy vấn Neo4j trực tiếp nếu có cấu hình hợp lệ và dữ liệu đồng bộ, nếu không dùng NetworkX để duyệt quan hệ HAS_DIABETES_THRESHOLD, HAS_PREDIABETES_RANGE.
+  4. Hybrid kết hợp điểm: score = alpha * vector_score + (1-alpha) * graph_score.
+  5. Top-k mệnh đề được đưa sang AnswerAgent.
+  6. AnswerAgent TRÍCH RÚT các câu có chứng cứ, gắn [NIDDK-01]; hiển thị URL gốc, đồ thị con và trace.
+
+Nói ngắn gọn: KB là NƠI LƯU tri thức và quan hệ; RAG là CƠ CHẾ TÌM các bằng chứng thích hợp từ KB/tài liệu trước khi trả lời. Đây không phải hai kho tách rời bất kỳ.
+
+Giới hạn kỹ thuật cần nói chính xác:
+- “Vector RAG” mặc định dùng TF-IDF lexical, KHÔNG phải embedding semantic BERT/SBERT.
+- AnswerAgent mặc định trích xuất bằng chứng, KHÔNG gọi LLM sinh câu trả lời mới.
+- GraphRAG là tìm thực thể + lân cận trên NetworkX, không phải tự động viết Cypher từ ngôn ngữ tự nhiên.
+- Có thể nâng cấp semantic embeddings, LLM thật, Neo4j Aura sau; chưa nên tuyên bố đã chạy các phần này nếu chưa cấu hình.
+
+VIII. TRẢ LỜI CÂU 5: “RAG + KB -> CHAT ???”
+-------------------------------------------
+Có. Vào tab “KB + RAG Chatbot”, nhập câu hỏi, chọn Vector/Graph/Hybrid và nhấn “Truy xuất và trả lời”. Kết quả gồm:
+- câu trả lời dạng trích rút có ID [WHO-01], [CDC-01], [NIDDK-01], v.v.;
+- bảng snippet và điểm xếp hạng;
+- URL nguồn để giảng viên mở kiểm chứng;
+- đồ thị con của các fact liên quan;
+- nhật ký router -> vector agent -> graph agent -> fusion -> answer agent;
+- tùy chọn kết hợp dự đoán từ mô hình Diabetes qua checkbox và các thông số ở tab Dự đoán.
+
+Câu hỏi demo 1: “HbA1c bao nhiêu là đái tháo đường?”
+  Cần tìm NIDDK-01, ngưỡng HbA1c từ 6,5% và lưu ý xét nghiệm xác nhận.
+Câu hỏi demo 2: “Vì sao đái tháo đường gây biến chứng thận, cần kiểm tra gì?”
+  Cần truy được các mối liên quan đường huyết tăng và tổn thương thận cùng chứng cứ WHO.
+Câu hỏi demo 3: “Bệnh tiểu đường có triệu chứng gì?”
+  Cần đưa các triệu chứng như khát, tiểu nhiều, mệt mỏi, nhìn mờ với dẫn nguồn.
+Câu hỏi ngoài miền “Công thức lượng tử là gì?” phải được từ chối vì không có chứng cứ trong KB tiểu đường.
+
+IX. TRẢ LỜI CÂU 6: “HỆ ĐA AGENT CHO DIABETES HOẠT ĐỘNG RA SAO?”
+-------------------------------------------------------------
+Có hai tầng riêng:
+(1) Huấn luyện và nghiên cứu: Orchestrator/MessageBus/Blackboard điều phối DataAgent -> ModelAgent -> EvaluatorAgent -> ComparatorAgent -> ReporterAgent. Evaluator có thể yêu cầu model train lại. Đây là luồng đa tác tử vận hành bằng luật và message, không phải nhiều LLM tự trị.
+(2) Dự đoán web: 3 mô hình độc lập đọc 3 nhóm đặc trưng, trả xác suất Pima/100k/BRFSS; mỗi agent có ngưỡng riêng; agent thiếu >=50% đặc trưng thì bị bỏ qua; các agent hợp lệ biểu quyết đa số. Hòa khi phiếu bằng nhau. Pima chỉ dùng cho dữ liệu phù hợp quần thể huấn luyện.
+(3) Khi chatbot bật “Kết hợp Clinical ML Predictor”, luồng tra cứu tri thức và luồng ML cùng chạy, nhưng KHÔNG lấy câu trả lời RAG làm dữ liệu huấn luyện ML và KHÔNG dùng chỉ số ML làm chẩn đoán bệnh.
+
+X. KỊCH BẢN DEMO 6–8 PHÚT TRÊN BẢN MỚI
+--------------------------------------
+0. Nếu deploy Render: push bản mới lên đúng repo, kiểm tra trạng thái build /healthz. Web cũ chưa tự cập nhật nếu chưa push.
+1. Tab “Dự đoán (3 agent)” -> “Điền ví dụ” -> “Dự đoán”. Trình bày xác suất từng mô hình, threshold, phiếu hội đồng. (Khoảng 1 phút.)
+2. Tab “Đồ thị Knowledge Graph”: hiện 46 thực thể, 46 quan hệ y khoa, 7 nguồn. Chọn “Đái tháo đường” và xem graph; tải .cypher + .graphml. (1 phút.)
+3. “Truy vấn đa chặng”: nhập bắt đầu “Đái tháo đường”, đích “Thận” -> “Tìm đường đi”. Cần thấy đường 2 chặng qua “Đường huyết tăng”. (1 phút.)
+4. Tab “KB + RAG Chatbot”: hỏi HbA1c, bấm “Truy xuất và trả lời”, mở snippet, link NIDDK, đồ thị con, nhật ký các công cụ. Chuyển Vector rồi Graph rồi Hybrid để thấy sự khác nhau. (2 phút.)
+5. Tick “Kết hợp Clinical ML Predictor”; nếu đã điền ví dụ ở tab 1, chạy lại câu hỏi và trình bày hai luồng KB và ML. (1 phút.)
+6. Tab “Đồ thị Knowledge Graph” -> thử tải web/PDF; giải thích lưu tạm trong phiên vs nhập bền vững bằng CLI. (1 phút.)
+7. Tab “Kết quả nghiên cứu” -> bảng AUC/Recall/F2 và biểu đồ từ outputs. (1 phút.)
+
+XI. NHỮNG PHẦN CÒN CHƯA THỂ TUYÊN BỐ HOÀN THÀNH 100%
+----------------------------------------------------
+1. Chưa có máy chủ Neo4j Aura được kết nối và xác nhận bằng credentials thực; bản mặc định dùng NetworkX.
+2. Không tự động hiểu mọi web/PDF thành fact y khoa; tự nhận diện MENTIONS, các quan hệ y khoa mặc định là đã biên tập thủ công.
+3. Chưa có OCR cho ảnh hoặc PDF scan; chỉ PDF có lớp văn bản mới được hỗ trợ.
+4. Chưa có embedding vector ngữ nghĩa hoặc LLM sinh ngôn ngữ theo API; câu trả lời là trích xuất có dẫn nguồn.
+5. Chưa có kiểm định chatbot theo bộ câu hỏi chuyên gia hoặc kiểm định lâm sàng ngoài mẫu.
+6. Cần triển khai ZIP mới lên GitHub/Render thì trang online cũ mới có các tab mới.
+7. Model joblib gốc được huấn luyện bằng scikit-learn 1.9.0; yêu cầu deploy pin cùng phiên bản. Test trong môi trường khác version có thể cảnh báo.
+8. Chưa có Deep Learning. Ba ứng viên huấn luyện hiện tại đều là mô hình ML cổ điển; muốn đáp ứng “DB -> DL” theo nghĩa Deep Learning phải thiết kế, huấn luyện và đánh giá thêm mạng neural thay vì chỉ đổi tên mô hình.
+
+XII. VỊ TRÍ CODE CẦN CHỈ KHI GIẢNG VIÊN HỎI
+------------------------------------------
+- Data training: config.py, main.py, agents/data_agent.py, agents/model_agent.py.
+- Multi-agent training control: agents/base.py, agents/orchestrator.py, agents/evaluator_agent.py.
+- Predict web: service.py -> predict(); models/*.joblib.
+- Knowledge base: knowledge/seed.json, knowledge/extra_sources.json.
+- Graph build & export: knowledge/engine.py, scripts/build_kb.py, knowledge/kb_diabetes.cypher, knowledge/kb_diabetes.graphml.
+- Neo4j: scripts/sync_neo4j.py, knowledge/neo4j_store.py.
+- Web/PDF ingestion: knowledge/ingest.py, scripts/ingest_source.py.
+- Vector, Graph, Hybrid RAG: knowledge/engine.py -> retrieve().
+- Tool agent chatbot: knowledge/assistant.py -> ask().
+- API: app.py (các route /api/chat, /api/kb...).
+- UI demo: templates/index.html, static/kb.js.
+- Test: tests/test_knowledge.py.
+
+XIII. NGUỒN MẪU ĐỂ MỞ KHI BỊ HỎI “LẤY TỪ ĐÂU?”
+----------------------------------------------
+[WHO-01] World Health Organization – Diabetes:
+https://www.who.int/news-room/fact-sheets/detail/diabetes
+[NIDDK-01] NIDDK/NIH – Diabetes Tests & Diagnosis:
+https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis
+[NIDDK-02] NIDDK/NIH – The A1C Test & Diabetes:
+https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test
+[CDC-01] CDC – Symptoms of Diabetes:
+https://www.cdc.gov/diabetes/signs-symptoms/
+[CDC-02] CDC – Type 2 Diabetes:
+https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html
+[VIN-01] Vinmec – Dấu hiệu sớm báo hiệu bệnh tiểu đường:
+https://www.vinmec.com/vie/bai-viet/dau-hieu-som-bao-hieu-benh-tieu-duong-vi
+[VIN-02] Vinmec – Các biến chứng mãn tính của bệnh tiểu đường:
+https://www.vinmec.com/vie/bai-viet/cac-bien-chung-man-tinh-cua-benh-tieu-duong-vi
+
+KẾT LUẬN ĐỂ TRẢ LỜI GIẢNG VIÊN (NGẮN GỌN):
+“Project đã có kho tri thức nguồn WHO/NIDDK/CDC/Vinmec, lưu dạng entity–relation có provenance, xuất Cypher/GraphML và hỗ trợ đồng bộ Neo4j. Chatbot dùng Vector Search + GraphRAG, kết hợp bằng Hybrid score, trả lời kèm bằng chứng và đồ thị con. Luồng ML dùng Pima/100k/BRFSS để huấn luyện mô hình riêng; luồng KB dùng tài liệu để truy xuất, không train lại mô hình. Mặc định graph chạy NetworkX; Neo4j live chỉ được khẳng định sau khi cấu hình và sync. Image/OCR, LLM sinh văn bản và Deep Learning chưa có, nên nhóm trình bày đúng giới hạn thay vì nhận là đã hoàn thành.”
+
+Lưu ý: Công cụ chỉ là sản phẩm học thuật; thông tin y khoa cần đối chiếu bác sĩ, không dùng để tự chẩn đoán.

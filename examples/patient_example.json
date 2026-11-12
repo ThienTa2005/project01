@@ -1,0 +1,8 @@
+{
+  "common": {"age": 52, "bmi": 33.5},
+  "pima": {"Pregnancies": 2, "Glucose": 150, "BloodPressure": 80, "BMI": 33.5, "DiabetesPedigreeFunction": 0.6, "Age": 52},
+  "kaggle100k": {"gender": "Female", "age": 52, "hypertension": 1, "heart_disease": 0, "smoking_history": "never",
+                 "bmi": 33.5, "hbA1c_level": 6.6, "blood_glucose_level": 155},
+  "brfss": {"HighBP": 1, "HighChol": 1, "CholCheck": 1, "BMI": 33.5, "Smoker": 0, "Stroke": 0, "HeartDiseaseorAttack": 0,
+            "PhysActivity": 0, "GenHlth": 4, "DiffWalk": 0, "Sex": 0, "Age": 8}
+}

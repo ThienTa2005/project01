@@ -1,0 +1,11 @@
+data/
+outputs/results.json
+outputs/agent_trace.jsonl
+__pycache__/
+*.pyc
+.git/
+.venv/
+tmp/
+.pytest_cache/
+Neo4j-*-Created-*.txt
+*aura*credentials*.txt

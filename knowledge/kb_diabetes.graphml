@@ -1,0 +1,783 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d6" for="edge" attr.name="evidence" attr.type="string" />
+  <key id="d5" for="edge" attr.name="fact_id" attr.type="string" />
+  <key id="d4" for="edge" attr.name="source_id" attr.type="string" />
+  <key id="d3" for="edge" attr.name="predicate" attr.type="string" />
+  <key id="d2" for="node" attr.name="url" attr.type="string" />
+  <key id="d1" for="node" attr.name="kind" attr.type="string" />
+  <key id="d0" for="node" attr.name="name" attr.type="string" />
+  <graph edgedefault="directed">
+    <node id="Đái tháo đường">
+      <data key="d0">Đái tháo đường</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Khát nhiều">
+      <data key="d0">Khát nhiều</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tiểu nhiều">
+      <data key="d0">Tiểu nhiều</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Mệt mỏi">
+      <data key="d0">Mệt mỏi</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Nhìn mờ">
+      <data key="d0">Nhìn mờ</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Sụt cân không chủ ý">
+      <data key="d0">Sụt cân không chủ ý</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Vết thương chậm lành">
+      <data key="d0">Vết thương chậm lành</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đái tháo đường típ 2">
+      <data key="d0">Đái tháo đường típ 2</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Thừa cân hoặc béo phì">
+      <data key="d0">Thừa cân hoặc béo phì</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Ít vận động">
+      <data key="d0">Ít vận động</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tiền sử gia đình">
+      <data key="d0">Tiền sử gia đình</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tiền sử đái tháo đường thai kỳ">
+      <data key="d0">Tiền sử đái tháo đường thai kỳ</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Bệnh thận do đái tháo đường">
+      <data key="d0">Bệnh thận do đái tháo đường</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tổn thương võng mạc">
+      <data key="d0">Tổn thương võng mạc</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tổn thương thần kinh">
+      <data key="d0">Tổn thương thần kinh</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Bệnh tim mạch">
+      <data key="d0">Bệnh tim mạch</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Loét bàn chân">
+      <data key="d0">Loét bàn chân</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="HbA1c">
+      <data key="d0">HbA1c</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đường huyết lúc đói">
+      <data key="d0">Đường huyết lúc đói</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Nghiệm pháp dung nạp glucose">
+      <data key="d0">Nghiệm pháp dung nạp glucose</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đường huyết trung bình khoảng 3 tháng">
+      <data key="d0">Đường huyết trung bình khoảng 3 tháng</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="5,7%–6,4%">
+      <data key="d0">5,7%–6,4%</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Từ 6,5%">
+      <data key="d0">Từ 6,5%</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Từ 126 mg/dL">
+      <data key="d0">Từ 126 mg/dL</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Vận động thể chất">
+      <data key="d0">Vận động thể chất</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Dinh dưỡng lành mạnh">
+      <data key="d0">Dinh dưỡng lành mạnh</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Duy trì cân nặng phù hợp">
+      <data key="d0">Duy trì cân nặng phù hợp</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Không hút thuốc lá">
+      <data key="d0">Không hút thuốc lá</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Metformin">
+      <data key="d0">Metformin</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đái tháo đường típ 1">
+      <data key="d0">Đái tháo đường típ 1</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Insulin">
+      <data key="d0">Insulin</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đường huyết tăng">
+      <data key="d0">Đường huyết tăng</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Thận">
+      <data key="d0">Thận</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Võng mạc">
+      <data key="d0">Võng mạc</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Dây thần kinh">
+      <data key="d0">Dây thần kinh</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Đái tháo đường thai kỳ">
+      <data key="d0">Đái tháo đường thai kỳ</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Hormone điều hòa đường huyết">
+      <data key="d0">Hormone điều hòa đường huyết</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Tuyến tụy">
+      <data key="d0">Tuyến tụy</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Kháng insulin">
+      <data key="d0">Kháng insulin</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Ít nhất 150 phút vận động vừa mỗi tuần">
+      <data key="d0">Ít nhất 150 phút vận động vừa mỗi tuần</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Hạn chế đường và chất béo bão hòa">
+      <data key="d0">Hạn chế đường và chất béo bão hòa</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Lối sống lành mạnh">
+      <data key="d0">Lối sống lành mạnh</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Insulin hoặc thuốc hạ đường huyết">
+      <data key="d0">Insulin hoặc thuốc hạ đường huyết</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Xét nghiệm máu tại cơ sở y tế">
+      <data key="d0">Xét nghiệm máu tại cơ sở y tế</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Máy đo đường huyết tại nhà">
+      <data key="d0">Máy đo đường huyết tại nhà</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="Theo dõi biến chứng định kỳ">
+      <data key="d0">Theo dõi biến chứng định kỳ</data>
+      <data key="d1">Entity</data>
+    </node>
+    <node id="SOURCE:WHO-01">
+      <data key="d0">WHO – Diabetes</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.who.int/news-room/fact-sheets/detail/diabetes</data>
+    </node>
+    <node id="SOURCE:NIDDK-01">
+      <data key="d0">NIDDK – Diabetes Tests &amp; Diagnosis</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis</data>
+    </node>
+    <node id="SOURCE:NIDDK-02">
+      <data key="d0">NIDDK – The A1C Test &amp; Diabetes</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test</data>
+    </node>
+    <node id="SOURCE:CDC-01">
+      <data key="d0">CDC – Symptoms of Diabetes</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.cdc.gov/diabetes/signs-symptoms/</data>
+    </node>
+    <node id="SOURCE:CDC-02">
+      <data key="d0">CDC – Type 2 Diabetes</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html</data>
+    </node>
+    <node id="SOURCE:VIN-01">
+      <data key="d0">Vinmec – Dấu hiệu sớm báo hiệu bệnh tiểu đường</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.vinmec.com/vie/bai-viet/dau-hieu-som-bao-hieu-benh-tieu-duong-vi</data>
+    </node>
+    <node id="SOURCE:VIN-02">
+      <data key="d0">Vinmec – Các biến chứng mãn tính của bệnh tiểu đường</data>
+      <data key="d1">Source</data>
+      <data key="d2">https://www.vinmec.com/vie/bai-viet/cac-bien-chung-man-tinh-cua-benh-tieu-duong-vi</data>
+    </node>
+    <edge source="Đái tháo đường" target="Khát nhiều" id="F001">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">CDC-01</data>
+      <data key="d5">F001</data>
+      <data key="d6">Khát nước nhiều là một trong các dấu hiệu thường gặp của bệnh đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Tiểu nhiều" id="F002">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">CDC-01</data>
+      <data key="d5">F002</data>
+      <data key="d6">Đi tiểu thường xuyên là dấu hiệu có thể gặp ở người mắc đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Mệt mỏi" id="F003">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">CDC-01</data>
+      <data key="d5">F003</data>
+      <data key="d6">Người mắc đái tháo đường có thể xuất hiện tình trạng mệt mỏi.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Nhìn mờ" id="F004">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">CDC-01</data>
+      <data key="d5">F004</data>
+      <data key="d6">Nhìn mờ có thể là triệu chứng của tăng đường huyết.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Sụt cân không chủ ý" id="F005">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F005</data>
+      <data key="d6">Sụt cân không chủ ý có thể xuất hiện ở một số người mắc đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Vết thương chậm lành" id="F006">
+      <data key="d3">HAS_SYMPTOM</data>
+      <data key="d4">VIN-01</data>
+      <data key="d5">F006</data>
+      <data key="d6">Vết thương lâu lành là dấu hiệu cần lưu ý khi đánh giá bệnh đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Bệnh thận do đái tháo đường" id="F011">
+      <data key="d3">HAS_COMPLICATION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F011</data>
+      <data key="d6">Đái tháo đường kéo dài có thể gây tổn thương thận.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Tổn thương võng mạc" id="F012">
+      <data key="d3">HAS_COMPLICATION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F012</data>
+      <data key="d6">Đái tháo đường có thể gây tổn thương mạch máu võng mạc và ảnh hưởng thị lực.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Tổn thương thần kinh" id="F013">
+      <data key="d3">HAS_COMPLICATION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F013</data>
+      <data key="d6">Đường huyết cao kéo dài có thể gây tổn thương hệ thần kinh.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Bệnh tim mạch" id="F014">
+      <data key="d3">HAS_COMPLICATION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F014</data>
+      <data key="d6">Người mắc đái tháo đường có nguy cơ biến cố tim mạch cao hơn.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Loét bàn chân" id="F015">
+      <data key="d3">HAS_COMPLICATION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F015</data>
+      <data key="d6">Tổn thương thần kinh và tuần hoàn kém có thể gây loét bàn chân ở người đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="HbA1c" id="F016">
+      <data key="d3">ASSESSED_WITH</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F016</data>
+      <data key="d6">Xét nghiệm HbA1c có thể được sử dụng trong sàng lọc và chẩn đoán đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Đường huyết lúc đói" id="F017">
+      <data key="d3">ASSESSED_WITH</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F017</data>
+      <data key="d6">Xét nghiệm glucose huyết tương lúc đói được dùng để phát hiện đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Nghiệm pháp dung nạp glucose" id="F018">
+      <data key="d3">ASSESSED_WITH</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F018</data>
+      <data key="d6">Nghiệm pháp dung nạp glucose đường uống là một xét nghiệm chẩn đoán đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Đường huyết tăng" id="F029">
+      <data key="d3">RELATED_TO</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F029</data>
+      <data key="d6">Đái tháo đường gắn với tình trạng glucose huyết tăng cao kéo dài.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Đái tháo đường típ 1" id="F034">
+      <data key="d3">HAS_TYPE</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F034</data>
+      <data key="d6">Đái tháo đường típ 1 có đặc điểm thiếu insulin và cần điều trị insulin.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Đái tháo đường típ 2" id="F035">
+      <data key="d3">HAS_TYPE</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F035</data>
+      <data key="d6">Đái tháo đường típ 2 liên quan việc cơ thể sử dụng insulin không hiệu quả.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Đái tháo đường thai kỳ" id="F036">
+      <data key="d3">HAS_TYPE</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F036</data>
+      <data key="d6">Đái tháo đường thai kỳ là tăng đường huyết xuất hiện trong giai đoạn thai kỳ.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Lối sống lành mạnh" id="F042">
+      <data key="d3">CAN_BE_TREATED_WITH</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F042</data>
+      <data key="d6">Đái tháo đường có thể được điều trị và quản lý bằng chế độ ăn, hoạt động thể chất và thuốc phù hợp.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Xét nghiệm máu tại cơ sở y tế" id="F044">
+      <data key="d3">ASSESSED_WITH</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F044</data>
+      <data key="d6">Đái tháo đường và tiền đái tháo đường được chẩn đoán bằng xét nghiệm máu do nhân viên y tế đánh giá.</data>
+    </edge>
+    <edge source="Đái tháo đường" target="Theo dõi biến chứng định kỳ" id="F046">
+      <data key="d3">REQUIRES</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F046</data>
+      <data key="d6">Sàng lọc biến chứng thường xuyên và điều trị kịp thời giúp hạn chế hậu quả của đái tháo đường.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Thừa cân hoặc béo phì" id="F007">
+      <data key="d3">HAS_RISK_FACTOR</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F007</data>
+      <data key="d6">Thừa cân hoặc béo phì làm tăng nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Ít vận động" id="F008">
+      <data key="d3">HAS_RISK_FACTOR</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F008</data>
+      <data key="d6">Hoạt động thể chất không đủ là một yếu tố nguy cơ của đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Tiền sử gia đình" id="F009">
+      <data key="d3">HAS_RISK_FACTOR</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F009</data>
+      <data key="d6">Có người thân bậc một mắc đái tháo đường típ 2 làm tăng nguy cơ mắc bệnh.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Tiền sử đái tháo đường thai kỳ" id="F010">
+      <data key="d3">HAS_RISK_FACTOR</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F010</data>
+      <data key="d6">Tiền sử đái tháo đường thai kỳ có liên quan tăng nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Vận động thể chất" id="F023">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F023</data>
+      <data key="d6">Hoạt động thể chất đều đặn có thể giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Dinh dưỡng lành mạnh" id="F024">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F024</data>
+      <data key="d6">Chế độ ăn lành mạnh giúp giảm nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Duy trì cân nặng phù hợp" id="F025">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F025</data>
+      <data key="d6">Duy trì cân nặng phù hợp giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Không hút thuốc lá" id="F026">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F026</data>
+      <data key="d6">Tránh hút thuốc lá là một phần trong chiến lược phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Metformin" id="F027">
+      <data key="d3">CAN_BE_TREATED_WITH</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F027</data>
+      <data key="d6">Metformin là một trong các nhóm thuốc được sử dụng điều trị đái tháo đường típ 2 theo chỉ định của bác sĩ.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Kháng insulin" id="F039">
+      <data key="d3">RELATED_TO</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F039</data>
+      <data key="d6">Trong đái tháo đường típ 2, tế bào không đáp ứng bình thường với insulin; tình trạng này được gọi là kháng insulin.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Ít nhất 150 phút vận động vừa mỗi tuần" id="F040">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F040</data>
+      <data key="d6">WHO khuyến nghị duy trì ít nhất 150 phút hoạt động thể chất mức độ vừa mỗi tuần để góp phần phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Hạn chế đường và chất béo bão hòa" id="F041">
+      <data key="d3">PREVENTION</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F041</data>
+      <data key="d6">Một chế độ ăn lành mạnh và hạn chế đường cùng chất béo bão hòa là một phần của phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 2" target="Insulin hoặc thuốc hạ đường huyết" id="F043">
+      <data key="d3">CAN_BE_TREATED_WITH</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F043</data>
+      <data key="d6">Một số người mắc đái tháo đường típ 2 cần insulin hoặc thuốc khác để kiểm soát đường huyết theo chỉ định chuyên môn.</data>
+    </edge>
+    <edge source="HbA1c" target="Đường huyết trung bình khoảng 3 tháng" id="F019">
+      <data key="d3">REFLECTS</data>
+      <data key="d4">NIDDK-02</data>
+      <data key="d5">F019</data>
+      <data key="d6">HbA1c phản ánh mức glucose trung bình trong khoảng ba tháng trước thời điểm xét nghiệm.</data>
+    </edge>
+    <edge source="HbA1c" target="5,7%–6,4%" id="F020">
+      <data key="d3">HAS_PREDIABETES_RANGE</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F020</data>
+      <data key="d6">HbA1c từ 5,7% đến 6,4% nằm trong khoảng tiền đái tháo đường.</data>
+    </edge>
+    <edge source="HbA1c" target="Từ 6,5%" id="F021">
+      <data key="d3">HAS_DIABETES_THRESHOLD</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F021</data>
+      <data key="d6">HbA1c từ 6,5% có thể thuộc ngưỡng chẩn đoán đái tháo đường và thường cần xét nghiệm xác nhận.</data>
+    </edge>
+    <edge source="Đường huyết lúc đói" target="Từ 126 mg/dL" id="F022">
+      <data key="d3">HAS_DIABETES_THRESHOLD</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F022</data>
+      <data key="d6">Glucose huyết tương lúc đói từ 126 mg/dL là một ngưỡng chẩn đoán đái tháo đường; thông thường cần xác nhận.</data>
+    </edge>
+    <edge source="Đái tháo đường típ 1" target="Insulin" id="F028">
+      <data key="d3">REQUIRES</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F028</data>
+      <data key="d6">Người mắc đái tháo đường típ 1 cần insulin để duy trì sự sống.</data>
+    </edge>
+    <edge source="Insulin" target="Hormone điều hòa đường huyết" id="F037">
+      <data key="d3">IS_A</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F037</data>
+      <data key="d6">Insulin là một hormone có vai trò điều hòa glucose trong máu.</data>
+    </edge>
+    <edge source="Insulin" target="Tuyến tụy" id="F038">
+      <data key="d3">PRODUCED_BY</data>
+      <data key="d4">CDC-02</data>
+      <data key="d5">F038</data>
+      <data key="d6">Insulin là hormone được tuyến tụy sản xuất và giúp đưa đường trong máu vào tế bào để sử dụng làm năng lượng.</data>
+    </edge>
+    <edge source="Đường huyết tăng" target="Thận" id="F030">
+      <data key="d3">CAN_DAMAGE</data>
+      <data key="d4">WHO-01</data>
+      <data key="d5">F030</data>
+      <data key="d6">Đường huyết cao lâu ngày có thể gây tổn thương thận.</data>
+    </edge>
+    <edge source="Đường huyết tăng" target="Võng mạc" id="F032">
+      <data key="d3">CAN_DAMAGE</data>
+      <data key="d4">VIN-02</data>
+      <data key="d5">F032</data>
+      <data key="d6">Đường huyết cao kéo dài có thể làm tổn thương võng mạc.</data>
+    </edge>
+    <edge source="Đường huyết tăng" target="Dây thần kinh" id="F033">
+      <data key="d3">CAN_DAMAGE</data>
+      <data key="d4">VIN-02</data>
+      <data key="d5">F033</data>
+      <data key="d6">Đường huyết cao kéo dài có thể gây bệnh lý thần kinh.</data>
+    </edge>
+    <edge source="Thận" target="Bệnh thận do đái tháo đường" id="F031">
+      <data key="d3">RELATED_TO</data>
+      <data key="d4">VIN-02</data>
+      <data key="d5">F031</data>
+      <data key="d6">Bệnh thận do đái tháo đường là một biến chứng vi mạch quan trọng.</data>
+    </edge>
+    <edge source="Máy đo đường huyết tại nhà" target="Đái tháo đường" id="F045">
+      <data key="d3">NOT_SUFFICIENT_FOR_DIAGNOSIS</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d5">F045</data>
+      <data key="d6">Máy đo đường huyết mua không cần đơn không thể tự xác lập chẩn đoán đái tháo đường; kết quả cần được cơ sở y tế đánh giá.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F005">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F005</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Sụt cân không chủ ý có thể xuất hiện ở một số người mắc đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F011">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F011</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường kéo dài có thể gây tổn thương thận.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F012">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F012</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường có thể gây tổn thương mạch máu võng mạc và ảnh hưởng thị lực.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F013">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F013</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đường huyết cao kéo dài có thể gây tổn thương hệ thần kinh.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F014">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F014</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Người mắc đái tháo đường có nguy cơ biến cố tim mạch cao hơn.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F015">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F015</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Tổn thương thần kinh và tuần hoàn kém có thể gây loét bàn chân ở người đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F029">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F029</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường gắn với tình trạng glucose huyết tăng cao kéo dài.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F034">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F034</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường típ 1 có đặc điểm thiếu insulin và cần điều trị insulin.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F035">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F035</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường típ 2 liên quan việc cơ thể sử dụng insulin không hiệu quả.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F036">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F036</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường thai kỳ là tăng đường huyết xuất hiện trong giai đoạn thai kỳ.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F042">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F042</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đái tháo đường có thể được điều trị và quản lý bằng chế độ ăn, hoạt động thể chất và thuốc phù hợp.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường" id="SUPPORTS:F046">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F046</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Sàng lọc biến chứng thường xuyên và điều trị kịp thời giúp hạn chế hậu quả của đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F023">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F023</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Hoạt động thể chất đều đặn có thể giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F024">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F024</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Chế độ ăn lành mạnh giúp giảm nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F025">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F025</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Duy trì cân nặng phù hợp giúp phòng ngừa hoặc trì hoãn đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F026">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F026</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Tránh hút thuốc lá là một phần trong chiến lược phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F027">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F027</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Metformin là một trong các nhóm thuốc được sử dụng điều trị đái tháo đường típ 2 theo chỉ định của bác sĩ.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F040">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F040</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">WHO khuyến nghị duy trì ít nhất 150 phút hoạt động thể chất mức độ vừa mỗi tuần để góp phần phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F041">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F041</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Một chế độ ăn lành mạnh và hạn chế đường cùng chất béo bão hòa là một phần của phòng ngừa đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 2" id="SUPPORTS:F043">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F043</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Một số người mắc đái tháo đường típ 2 cần insulin hoặc thuốc khác để kiểm soát đường huyết theo chỉ định chuyên môn.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đái tháo đường típ 1" id="SUPPORTS:F028">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F028</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Người mắc đái tháo đường típ 1 cần insulin để duy trì sự sống.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Đường huyết tăng" id="SUPPORTS:F030">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F030</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Đường huyết cao lâu ngày có thể gây tổn thương thận.</data>
+    </edge>
+    <edge source="SOURCE:WHO-01" target="Insulin" id="SUPPORTS:F037">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F037</data>
+      <data key="d4">WHO-01</data>
+      <data key="d6">Insulin là một hormone có vai trò điều hòa glucose trong máu.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Đái tháo đường" id="SUPPORTS:F016">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F016</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Xét nghiệm HbA1c có thể được sử dụng trong sàng lọc và chẩn đoán đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Đái tháo đường" id="SUPPORTS:F017">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F017</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Xét nghiệm glucose huyết tương lúc đói được dùng để phát hiện đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Đái tháo đường" id="SUPPORTS:F018">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F018</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Nghiệm pháp dung nạp glucose đường uống là một xét nghiệm chẩn đoán đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Đái tháo đường" id="SUPPORTS:F044">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F044</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Đái tháo đường và tiền đái tháo đường được chẩn đoán bằng xét nghiệm máu do nhân viên y tế đánh giá.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="HbA1c" id="SUPPORTS:F020">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F020</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">HbA1c từ 5,7% đến 6,4% nằm trong khoảng tiền đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="HbA1c" id="SUPPORTS:F021">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F021</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">HbA1c từ 6,5% có thể thuộc ngưỡng chẩn đoán đái tháo đường và thường cần xét nghiệm xác nhận.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Đường huyết lúc đói" id="SUPPORTS:F022">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F022</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Glucose huyết tương lúc đói từ 126 mg/dL là một ngưỡng chẩn đoán đái tháo đường; thông thường cần xác nhận.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-01" target="Máy đo đường huyết tại nhà" id="SUPPORTS:F045">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F045</data>
+      <data key="d4">NIDDK-01</data>
+      <data key="d6">Máy đo đường huyết mua không cần đơn không thể tự xác lập chẩn đoán đái tháo đường; kết quả cần được cơ sở y tế đánh giá.</data>
+    </edge>
+    <edge source="SOURCE:NIDDK-02" target="HbA1c" id="SUPPORTS:F019">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F019</data>
+      <data key="d4">NIDDK-02</data>
+      <data key="d6">HbA1c phản ánh mức glucose trung bình trong khoảng ba tháng trước thời điểm xét nghiệm.</data>
+    </edge>
+    <edge source="SOURCE:CDC-01" target="Đái tháo đường" id="SUPPORTS:F001">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F001</data>
+      <data key="d4">CDC-01</data>
+      <data key="d6">Khát nước nhiều là một trong các dấu hiệu thường gặp của bệnh đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:CDC-01" target="Đái tháo đường" id="SUPPORTS:F002">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F002</data>
+      <data key="d4">CDC-01</data>
+      <data key="d6">Đi tiểu thường xuyên là dấu hiệu có thể gặp ở người mắc đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:CDC-01" target="Đái tháo đường" id="SUPPORTS:F003">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F003</data>
+      <data key="d4">CDC-01</data>
+      <data key="d6">Người mắc đái tháo đường có thể xuất hiện tình trạng mệt mỏi.</data>
+    </edge>
+    <edge source="SOURCE:CDC-01" target="Đái tháo đường" id="SUPPORTS:F004">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F004</data>
+      <data key="d4">CDC-01</data>
+      <data key="d6">Nhìn mờ có thể là triệu chứng của tăng đường huyết.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Đái tháo đường típ 2" id="SUPPORTS:F007">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F007</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Thừa cân hoặc béo phì làm tăng nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Đái tháo đường típ 2" id="SUPPORTS:F008">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F008</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Hoạt động thể chất không đủ là một yếu tố nguy cơ của đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Đái tháo đường típ 2" id="SUPPORTS:F009">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F009</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Có người thân bậc một mắc đái tháo đường típ 2 làm tăng nguy cơ mắc bệnh.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Đái tháo đường típ 2" id="SUPPORTS:F010">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F010</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Tiền sử đái tháo đường thai kỳ có liên quan tăng nguy cơ mắc đái tháo đường típ 2.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Đái tháo đường típ 2" id="SUPPORTS:F039">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F039</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Trong đái tháo đường típ 2, tế bào không đáp ứng bình thường với insulin; tình trạng này được gọi là kháng insulin.</data>
+    </edge>
+    <edge source="SOURCE:CDC-02" target="Insulin" id="SUPPORTS:F038">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F038</data>
+      <data key="d4">CDC-02</data>
+      <data key="d6">Insulin là hormone được tuyến tụy sản xuất và giúp đưa đường trong máu vào tế bào để sử dụng làm năng lượng.</data>
+    </edge>
+    <edge source="SOURCE:VIN-01" target="Đái tháo đường" id="SUPPORTS:F006">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F006</data>
+      <data key="d4">VIN-01</data>
+      <data key="d6">Vết thương lâu lành là dấu hiệu cần lưu ý khi đánh giá bệnh đái tháo đường.</data>
+    </edge>
+    <edge source="SOURCE:VIN-02" target="Thận" id="SUPPORTS:F031">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F031</data>
+      <data key="d4">VIN-02</data>
+      <data key="d6">Bệnh thận do đái tháo đường là một biến chứng vi mạch quan trọng.</data>
+    </edge>
+    <edge source="SOURCE:VIN-02" target="Đường huyết tăng" id="SUPPORTS:F032">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F032</data>
+      <data key="d4">VIN-02</data>
+      <data key="d6">Đường huyết cao kéo dài có thể làm tổn thương võng mạc.</data>
+    </edge>
+    <edge source="SOURCE:VIN-02" target="Đường huyết tăng" id="SUPPORTS:F033">
+      <data key="d3">SUPPORTS</data>
+      <data key="d5">F033</data>
+      <data key="d4">VIN-02</data>
+      <data key="d6">Đường huyết cao kéo dài có thể gây bệnh lý thần kinh.</data>
+    </edge>
+  </graph>
+</graphml>
