@@ -157,6 +157,15 @@ DOMAIN_TERMS = (
     "duong huyet", "duong mau", "hba1c", "a1c", "tien dai thao",
 )
 FOLLOWUP_MARKERS = ("con ", "the con", "vay ", "truong hop nay", "benh nay", "no ", "nhu the nao")
+SMALLTALK_EXACT = {
+    "hi", "hello", "hey", "alo", "chao", "xin chao", "chao ban",
+    "cam on", "cam on ban", "thanks", "thank you",
+    "ban la ai", "ban lam duoc gi", "giup toi voi", "help",
+}
+SMALLTALK_PHRASES = (
+    "xin chao", "chao diabot", "cam on diabot", "ban co the lam gi",
+    "chatbot nay lam gi", "huong dan toi",
+)
 
 
 def selected_entities(question: str):
@@ -178,6 +187,9 @@ def selected_entities(question: str):
 
 def detect_intents(question: str):
     q = normalize(question)
+    if (q in SMALLTALK_EXACT
+            or (len(q.split()) <= 10 and any(phrase in q for phrase in SMALLTALK_PHRASES))):
+        return ["smalltalk"]
     intents = [name for name, phrases in INTENT_RULES if any(p in q for p in phrases)]
     return intents or ["general"]
 
@@ -445,6 +457,29 @@ def retrieve(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extra_docume
     validated_extras = validate_extra_docs(extra_documents)
     docs = data["sources"] + validated_extras
     profile = question_profile(question, history)
+    if profile["primary_intent"] == "smalltalk":
+        q = normalize(question)
+        if "cam on" in q or "thank" in q:
+            answer = "Rất vui vì đã hỗ trợ bạn. Bạn có thể hỏi tiếp về đái tháo đường, xét nghiệm, nguy cơ, phòng ngừa hoặc biến chứng."
+        elif "ban la ai" in q or "lam gi" in q or "giup" in q or "help" in q:
+            answer = ("Mình là DiaBot, trợ lý của hệ đa tác tử về đái tháo đường. "
+                      "Mình có thể giải thích kiến thức có nguồn, truy xuất Knowledge Graph "
+                      "và hỗ trợ diễn giải kết quả nghiên cứu; mình không thay thế bác sĩ.")
+        else:
+            answer = ("Chào bạn! Mình là DiaBot. Bạn muốn tìm hiểu điều gì về đái tháo đường? "
+                      "Ví dụ: ngưỡng HbA1c, yếu tố nguy cơ, cách phòng ngừa hoặc biến chứng.")
+        return {
+            "question": question, "method": method, "top_k": top_k, "hops": hops, "alpha": alpha,
+            "answer": answer, "answer_mode": "smalltalk-safe", "graph_backend": "Không truy vấn (hội thoại)",
+            "snippets": [], "sources": [], "subgraph": {"nodes": [], "edges": []},
+            "entity_matches": [], "intent": "smalltalk", "context_used": False,
+            "effective_question": question.strip(),
+            "trace": [{
+                "agent": "ConversationRouter",
+                "action": "Nhận diện hội thoại xã giao",
+                "detail": "Không cần truy vấn dữ kiện y khoa",
+            }],
+        }
     # Không trả lời câu ngoài phạm vi bằng những gram ký tự trùng ngẫu nhiên.
     if not profile["in_scope"] and not validated_extras:
         return {"question": question, "method": method, "top_k": top_k, "hops": hops, "alpha": alpha,

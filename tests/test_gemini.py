@@ -1,5 +1,6 @@
 """Gemini integration tests use a fake provider call and never spend API quota."""
 from knowledge import gemini
+from knowledge.engine import retrieve
 
 
 SNIPPETS = [{
@@ -64,6 +65,35 @@ def test_gemini_unknown_citation_is_rejected(monkeypatch):
     assert result["used"] is False
     assert result["answer"] == "offline-safe"
     assert result["fallback_reason"] == "unknown_citation"
+
+
+def test_smalltalk_router_returns_friendly_answer_without_fake_sources():
+    result = retrieve("hi")
+    assert result["intent"] == "smalltalk"
+    assert "Chào bạn" in result["answer"]
+    assert result["sources"] == []
+    assert result["snippets"] == []
+
+
+def test_smalltalk_can_use_gemini_without_evidence(monkeypatch):
+    monkeypatch.setenv("GEMINI_ENABLED", "true")
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-test-key")
+    monkeypatch.setattr(
+        gemini,
+        "_call_gemini",
+        lambda api_key, model, prompt: (
+            "Chào bạn! Mình là DiaBot. Bạn muốn hỏi gì về đái tháo đường?"
+        ),
+    )
+    result = gemini.enhance_grounded_answer(
+        question="hi",
+        offline_answer="Chào bạn!",
+        snippets=[],
+        sources=[],
+        allow_without_evidence=True,
+    )
+    assert result["used"] is True
+    assert result["provider"] == "gemini"
 
 
 def test_gemini_status_endpoint_does_not_expose_key(monkeypatch):

@@ -151,7 +151,16 @@
       CHAT_HISTORY=CHAT_HISTORY.slice(-12);
       const context=d.context_used?' · đã hiểu theo câu hỏi trước':'';
       el('kb-typing')?.remove();
-      const generator=d.llm?.used?`Gemini · ${d.llm.model}`:'RAG offline';
+      const fallbackLabels={
+        disabled:'Gemini chưa bật',missing_api_key:'thiếu API key',sdk_not_installed:'thiếu Google SDK',
+        no_retrieved_evidence:'không có bằng chứng',missing_citation:'Gemini thiếu trích dẫn',
+        unknown_citation:'Gemini tạo nguồn không hợp lệ'
+      };
+      const fallback=d.llm?.fallback_reason||'';
+      const fallbackText=fallback.startsWith('provider_error:')
+        ?'lỗi kết nối/quota Gemini'
+        :(fallbackLabels[fallback]||'RAG offline');
+      const generator=d.llm?.used?`Gemini · ${d.llm.model}`:`Offline · ${fallbackText}`;
       chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'NetworkX'} · ${generator}`);
       el('kb-answer').textContent=d.answer+'\n\n(Ý định: '+(d.intent||'general')+context+' · KG backend: '+(d.graph_backend||'NetworkX')+')';
       const sn=el('kb-snippets');clear(sn);
@@ -208,7 +217,7 @@
   };
   api('/api/llm/gemini').then(status=>{
     const badge=el('gemini-status');if(!badge)return;
-    badge.textContent=status.available?'Gemini bật':'Gemini offline';
+    badge.textContent=status.available?'Gemini sẵn sàng':'Gemini offline';
     badge.classList.toggle('gemini-on',!!status.available);
     badge.title=status.available
       ?`Explanation Agent: ${status.model}`

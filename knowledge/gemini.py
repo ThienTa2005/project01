@@ -15,7 +15,7 @@ DEFAULT_MODEL = "gemini-3.5-flash-lite"
 SYSTEM_INSTRUCTION = """Bạn là Explanation Agent trong hệ đa tác tử hỗ trợ quyết định về đái tháo đường.
 
 QUY TẮC BẮT BUỘC:
-1. Chỉ sử dụng dữ kiện nằm trong khối BẰNG CHỨNG và NGỮ CẢNH TÁC TỬ được cung cấp.
+1. Với câu hỏi y khoa, chỉ sử dụng dữ kiện nằm trong khối BẰNG CHỨNG và NGỮ CẢNH TÁC TỬ được cung cấp.
 2. Mỗi nhận định y khoa lấy từ bằng chứng phải kết thúc bằng đúng một hoặc nhiều mã nguồn dạng [SOURCE_ID].
 3. Không tự tạo nguồn, số liệu, chẩn đoán, thuốc, liều dùng hoặc kế hoạch điều trị.
 4. Nếu bằng chứng không đủ, nói rõ giới hạn thay vì suy đoán.
@@ -23,6 +23,7 @@ QUY TẮC BẮT BUỘC:
 6. Không khẳng định người dùng mắc bệnh. Khi phù hợp, nhắc cần nhân viên y tế đánh giá và xét nghiệm xác nhận.
 7. Trả lời bằng tiếng Việt tự nhiên, dễ hiểu, đi thẳng vào câu hỏi; có thể dùng gạch đầu dòng ngắn.
 8. Không viết danh sách tài liệu tham khảo riêng vì giao diện đã hiển thị nguồn.
+9. Nếu CHẾ ĐỘ là HỘI THOẠI XÃ GIAO, bạn được phép chào hỏi, cảm ơn hoặc giới thiệu khả năng của DiaBot mà không cần nguồn; không mở rộng sang kiến thức ngoài phạm vi đái tháo đường.
 """
 
 
@@ -73,6 +74,7 @@ def _build_prompt(
     snippets: list[dict[str, Any]],
     history: object,
     extra_context: str,
+    allow_without_evidence: bool,
 ) -> str:
     evidence = []
     for index, item in enumerate(snippets[:10], start=1):
@@ -86,7 +88,11 @@ def _build_prompt(
     ) or "(không có)"
     evidence_text = "\n".join(evidence) or "(không có bằng chứng)"
     context = str(extra_context or "").strip()[:5000] or "(không có)"
-    return f"""CÂU HỎI HIỆN TẠI:
+    mode = "HỘI THOẠI XÃ GIAO" if allow_without_evidence else "TRẢ LỜI Y KHOA CÓ BẰNG CHỨNG"
+    return f"""CHẾ ĐỘ:
+{mode}
+
+CÂU HỎI HIỆN TẠI:
 {question.strip()[:600]}
 
 LỊCH SỬ HỘI THOẠI:
@@ -145,6 +151,7 @@ def enhance_grounded_answer(
     sources: list[dict[str, Any]] | None,
     history: object = None,
     extra_context: str = "",
+    allow_without_evidence: bool = False,
 ) -> dict[str, Any]:
     """Return a Gemini answer or the deterministic offline answer with metadata."""
     status = gemini_status()
@@ -169,7 +176,7 @@ def enhance_grounded_answer(
         for source in clean_sources
         if isinstance(source, dict) and source.get("id")
     }
-    if not clean_snippets or not allowed_ids:
+    if (not clean_snippets or not allowed_ids) and not allow_without_evidence:
         return {**base, "fallback_reason": "no_retrieved_evidence"}
 
     api_key = (
@@ -177,7 +184,9 @@ def enhance_grounded_answer(
         or os.environ.get("GOOGLE_API_KEY", "").strip()
     )
     model = str(status["model"])
-    prompt = _build_prompt(question, clean_snippets, history, extra_context)
+    prompt = _build_prompt(
+        question, clean_snippets, history, extra_context, allow_without_evidence
+    )
     try:
         answer = _call_gemini(api_key, model, prompt)
     except Exception as exc:  # provider/network/quota failures must not break the demo

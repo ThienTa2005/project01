@@ -18,6 +18,7 @@ def ask(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extras=None,
         snippets=r.get("snippets", []),
         sources=r.get("sources", []),
         history=history,
+        allow_without_evidence=r.get("intent") == "smalltalk",
     )
     r["answer"] = generated["answer"]
     r["llm"] = {k: v for k, v in generated.items() if k != "answer"}
