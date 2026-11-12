@@ -15,3 +15,6 @@ pypdf>=5.0,<7
 
 # Driver Neo4j tùy chọn, có hiệu lực khi đặt NEO4J_URI/NEO4J_PASSWORD
 neo4j>=5.20,<7
+
+# Explanation Agent tùy chọn; chỉ gọi API khi GEMINI_ENABLED=true và có secret.
+google-genai>=3.2,<4

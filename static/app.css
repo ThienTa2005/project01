@@ -307,6 +307,7 @@ tbody tr:hover { background: #f8fbfa; }
 .online-dot { width: 5px; height: 5px; box-shadow: none; }
 .chat-header-tags { display: flex; gap: 5px; }
 .chat-header-tags span { padding: 4px 7px; border-radius: 99px; color: var(--teal); background: var(--teal-soft); font-size: 7px; font-weight: 800; text-transform: uppercase; }
+.chat-header-tags span.gemini-on { color: #6b4ac5; background: var(--violet-soft); box-shadow: inset 0 0 0 1px rgba(120,86,216,.12); }
 .chat-messages { flex: 1; min-height: 310px; max-height: calc(100vh - 430px); overflow-y: auto; padding: 24px 22px 15px; background: linear-gradient(#fbfdfd, #f7faf9); scroll-behavior: smooth; }
 .chat-messages::-webkit-scrollbar, .sidebar::-webkit-scrollbar { width: 5px; }
 .chat-messages::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb { border-radius: 5px; background: #cadbd8; }

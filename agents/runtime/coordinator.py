@@ -85,7 +85,15 @@ class DecisionSupportCoordinator:
             history=request.get("history"),
         )
         results.append(kg_result)
-        explanation = self.explanation_agent.execute(request_id, data_result, dl_result, rule_result, kg_result)
+        explanation = self.explanation_agent.execute(
+            request_id,
+            data_result,
+            dl_result,
+            rule_result,
+            kg_result,
+            question=str(request.get("question") or ""),
+            history=request.get("history"),
+        )
         results.append(explanation)
 
         if request.get("simulate_rl"):

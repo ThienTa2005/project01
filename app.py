@@ -10,6 +10,7 @@ import service
 from agents.runtime import DecisionSupportCoordinator
 from config import ROOT
 from knowledge.engine import all_data, graph_stats, find_path, graph, extract_mentions
+from knowledge.gemini import gemini_status
 from knowledge.assistant import ask as ask_kb
 from knowledge.neo4j_store import neo4j_status
 from knowledge.ingest import ingest_pdf, ingest_url
@@ -31,12 +32,19 @@ def healthz():
                    models={d: service.load_model(d) is not None for d in service.AGENTS},
                    dl_model=(ROOT / "models" / "diabetes_dl_v1.joblib").exists(),
                    runtime_mas="decision-coordinator-v1.0",
+                   llm=gemini_status(),
                    kb=graph_stats())
 
 
 @app.get("/api/schema")
 def schema():
     return jsonify(schema=service.SCHEMA, agents={d: service.AGENT_LABEL[d] for d in service.AGENTS})
+
+
+@app.get("/api/llm/gemini")
+def gemini_info():
+    """Report configuration only; never performs a paid call or exposes secrets."""
+    return jsonify(gemini_status())
 
 
 @app.post("/api/predict")
@@ -164,6 +172,12 @@ def kb_chat():
             kg = decision["agent_results"]["KGRAGAgent"]["payload"]
             response = dict(kg)
             response["answer"] = decision["report"]["narrative"]
+            response["llm"] = decision["report"].get("generation", {})
+            response["answer_mode"] = (
+                "gemini-grounded-mas"
+                if response["llm"].get("used")
+                else "extractive-offline (Gemini fallback)"
+            )
             response["decision_support"] = decision
             response["ml_prediction"] = None
             response["multi_agent_note"] = "Luồng MAS runtime qua CoordinatorAgent và hợp đồng message có phiên bản."

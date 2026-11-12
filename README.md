@@ -33,11 +33,39 @@ python app.py                  # mở http://localhost:8000
 
 Web **không cần dữ liệu gốc** (`data/`) và không huấn luyện lại, chỉ đọc `models/*.joblib` (~0,4 MB) nên rất nhẹ.
 
+### Bật Google Gemini cho Explanation Agent
+
+Gemini là lớp diễn đạt **tùy chọn** đặt sau KG/RAG: hệ thống vẫn truy xuất
+Neo4j/TF-IDF trước, chỉ gửi câu hỏi, lịch sử ngắn, các snippet và mã nguồn sang
+Gemini. Câu trả lời có citation lạ hoặc thiếu citation sẽ bị loại và tự quay về
+câu trả lời offline. Không gửi API key xuống trình duyệt.
+
+~~~powershell
+pip install -r requirements-web.txt
+$env:GEMINI_ENABLED='true'
+$env:GEMINI_API_KEY='<api-key-lay-tu-Google-AI-Studio>'
+$env:GEMINI_MODEL='gemini-3.5-flash-lite'
+python app.py
+~~~
+
+Không ghi khóa vào mã nguồn, file môi trường thật hoặc GitHub. Kiểm tra cấu
+hình mà không thực hiện API call:
+
+~~~powershell
+Invoke-RestMethod 'http://localhost:8000/api/llm/gemini' | ConvertTo-Json
+~~~
+
+Khi deploy Render, đặt GEMINI_API_KEY trong **Environment/Secret**.
+render.yaml đã khai báo GEMINI_ENABLED, GEMINI_MODEL và secret rỗng để Render
+yêu cầu nhập. Nếu API lỗi, hết quota hoặc chưa có key, web vẫn chạy với
+_compose_answer() offline.
+
 | Đường dẫn | Mô tả |
 |---|---|
 | `GET /` | Giao diện |
 | `GET /healthz` | Kiểm tra sống + mô hình đã nạp |
 | `GET /api/schema` | Danh sách trường nhập của từng agent |
+| `GET /api/llm/gemini` | Trạng thái Gemini, không gọi model và không lộ API key |
 | `POST /api/predict` | Dự đoán, nhận JSON cùng định dạng `examples/patient_example.json` |
 | `POST /api/decision-support` | Chạy MAS runtime: Data → DL → Rule → KG/RAG → Explanation → Monitoring |
 | `GET /api/report` | Bảng chỉ số + danh sách biểu đồ |
@@ -153,7 +181,7 @@ Dockerfile, Procfile, render.yaml   cấu hình deploy
 | Vector RAG | Kết hợp TF-IDF n-gram từ + ký tự, mở rộng đồng nghĩa/ý định | Lexical retrieval cải tiến, không phải semantic embedding |
 | GraphRAG | Tìm thực thể, duyệt cạnh 1–3 chặng | Là retrieval dựa đồ thị, không phải LLM tự viết Cypher |
 | Hybrid | `α × vector_score + (1−α) × graph_score` | Chỉ là phương pháp kết hợp điểm minh họa, chưa benchmark trên ground-truth chuyên gia |
-| Chatbot | Trả lời trích rút + nguồn + đồ thị con + trace | **Không** phải LLM thật; không được đoán chứng cứ |
+| Chatbot | Trả lời trích rút + nguồn + đồ thị con + trace; Gemini Explanation Agent tùy chọn | Mặc định offline; Gemini chỉ diễn đạt trên evidence và tự fallback nếu citation không hợp lệ |
 | Web/PDF | Web HTTPS WHO/NIDDK/CDC/Vinmec hoặc PDF text, trích entity mentions | Nội dung mới trong web giữ tạm theo phiên; CLI có thể lưu bền vững. Không OCR PDF ảnh |
 | Image/OCR | Chưa triển khai | Không nhận ảnh hoặc PDF scan là nguồn text; không được trình bày là đã có OCR |
 | Deep Learning | **Đã triển khai** `diabetes-mlp-v1.0` | MLP 2 tầng ẩn 64/32, artifact và metadata có phiên bản; AUC test 0,976 trên 19.998 bản ghi |
@@ -244,6 +272,7 @@ Sau khi kiểm tra nội dung, commit `knowledge/extra_sources.json` cùng file 
 | `GET /api/kb/graph` | Nút/cạnh cho đồ thị |
 | `GET /api/kb/path?start=...&end=...&hops=5` | Đường đi đa chặng |
 | `GET /api/kb/neo4j` | Kiểm tra kết nối Neo4j (không tiết lộ secrets) |
+| `GET /api/llm/gemini` | Kiểm tra Gemini enabled/configured/SDK/model, không tiết lộ secret |
 | `GET /kb-diabetes/kb_diabetes.cypher` | Tải file Cypher |
 | `GET /kb-diabetes/kb_diabetes.graphml` | Tải GraphML |
 | `POST /api/kb/ingest` | JSON `{ "url": "https://..." }` hoặc `multipart` PDF `file` |

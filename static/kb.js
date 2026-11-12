@@ -151,7 +151,8 @@
       CHAT_HISTORY=CHAT_HISTORY.slice(-12);
       const context=d.context_used?' · đã hiểu theo câu hỏi trước':'';
       el('kb-typing')?.remove();
-      chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'NetworkX'} · ${d.intent||'general'}`);
+      const generator=d.llm?.used?`Gemini · ${d.llm.model}`:'RAG offline';
+      chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'NetworkX'} · ${generator}`);
       el('kb-answer').textContent=d.answer+'\n\n(Ý định: '+(d.intent||'general')+context+' · KG backend: '+(d.graph_backend||'NetworkX')+')';
       const sn=el('kb-snippets');clear(sn);
       d.snippets.forEach(s=>{const w=document.createElement('div');w.className='well';w.style.margin='6px 0';
@@ -205,4 +206,12 @@
       EXTRA.push(data);showSession();
     }catch(err){el('kb-ingest-error').textContent=err.message}finally{btn.disabled=false}
   };
+  api('/api/llm/gemini').then(status=>{
+    const badge=el('gemini-status');if(!badge)return;
+    badge.textContent=status.available?'Gemini bật':'Gemini offline';
+    badge.classList.toggle('gemini-on',!!status.available);
+    badge.title=status.available
+      ?`Explanation Agent: ${status.model}`
+      :status.configured?'Đã có API key nhưng GEMINI_ENABLED chưa bật hoặc SDK chưa sẵn sàng':'Đang dùng câu trả lời RAG offline';
+  }).catch(()=>{});
 })();

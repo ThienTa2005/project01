@@ -1,17 +1,21 @@
 """Build an evidence-grounded decision-support report without diagnosing."""
 from __future__ import annotations
 
+import json
 import time
+
+from knowledge.gemini import enhance_grounded_answer
 
 from .contracts import AgentResult
 
 
 class ExplanationAgent:
     name = "ExplanationAgent"
-    version = "explanation-template-v1.0"
+    version = "explanation-gemini-fallback-v1.1"
 
     def execute(self, request_id: str, data_result: AgentResult, dl_result: AgentResult,
-                rule_result: AgentResult, kg_result: AgentResult) -> AgentResult:
+                rule_result: AgentResult, kg_result: AgentResult, *,
+                question: str = "", history: object = None) -> AgentResult:
         started = time.perf_counter()
         limitations = [
             "Đây là nguyên mẫu giáo dục/nghiên cứu, không phải hệ thống chẩn đoán đã được thẩm định lâm sàng.",
@@ -70,6 +74,22 @@ class ExplanationAgent:
             "input_warnings": data_result.payload.get("warnings", []),
             "limitations": limitations,
         }
+        agent_context = json.dumps({
+            "prediction": prediction,
+            "rule_flags": rules,
+            "human_review_required": human_review,
+            "limitations": limitations,
+        }, ensure_ascii=False, default=str)
+        generated = enhance_grounded_answer(
+            question=question,
+            offline_answer=report["narrative"],
+            snippets=report["retrieved_evidence"],
+            sources=report["sources"],
+            history=history,
+            extra_context=agent_context,
+        )
+        report["narrative"] = generated["answer"]
+        report["generation"] = {k: v for k, v in generated.items() if k != "answer"}
         return AgentResult(
             request_id=request_id,
             agent=self.name,

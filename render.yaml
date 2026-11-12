@@ -18,3 +18,9 @@ services:
         sync: false
       - key: NEO4J_DATABASE
         value: neo4j
+      - key: GEMINI_ENABLED
+        value: "true"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
