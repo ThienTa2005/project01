@@ -4,6 +4,10 @@ import pytest
 pytest.importorskip('flask')
 
 from app import app
+from scripts.build_kb import KB_GROUPS
+
+
+EXPECTED_KB_FILES = sorted(KB_GROUPS)
 
 
 @pytest.fixture
@@ -16,8 +20,10 @@ def client():
 def test_health_and_kb(client):
     r = client.get('/healthz')
     assert r.status_code == 200 and r.json['kb']['relations'] >= 30
+    assert r.json['kb']['runtime_source'] == 'cypher'
     r = client.get('/api/kb')
     assert r.status_code == 200 and len(r.json['sources']) >= 7
+    assert r.json['stats']['kb_files'] == EXPECTED_KB_FILES
 
 
 def test_graph_path_and_sources(client):
@@ -25,13 +31,16 @@ def test_graph_path_and_sources(client):
     assert g.status_code == 200 and len(g.json['edges']) >= 36
     r = client.get('/api/kb/path?start=%C4%90%C3%A1i%20th%C3%A1o%20%C4%91%C6%B0%E1%BB%9Dng&end=Th%E1%BA%ADn')
     assert r.status_code == 200 and r.json['hops']==2
-    assert client.get('/kb-diabetes/kb_diabetes.cypher').status_code == 200
+    assert all(client.get(f'/kb-diabetes/{name}').status_code == 200
+               for name in EXPECTED_KB_FILES)
 
 
 def test_rag_endpoint(client):
     r=client.post('/api/chat',json={'question':'HbA1c bao nhiêu là đái tháo đường?', 'method':'hybrid'})
     assert r.status_code==200 and '6,5%' in r.json['answer']
     assert r.json['sources']
+    assert r.json['runtime_source'] == 'cypher'
+    assert all(s['kb_file'] for s in r.json['snippets'] if s['kind'] == 'fact')
 
 
 def test_rag_follow_up_history(client):

@@ -70,6 +70,8 @@ class ExplanationAgent:
             "rule_flags": rules,
             "retrieved_evidence": knowledge.get("snippets", []),
             "sources": knowledge.get("sources", []),
+            "kb_files": knowledge.get("kb_files", []),
+            "knowledge_runtime_source": knowledge.get("runtime_source", "cypher"),
             "human_review_required": human_review,
             "input_warnings": data_result.payload.get("warnings", []),
             "limitations": limitations,

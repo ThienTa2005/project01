@@ -1,0 +1,22 @@
+// Runtime KB: dữ kiện có source_id, evidence và kb_file.
+CREATE CONSTRAINT entity_id_unique IF NOT EXISTS FOR (n:Entity) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT source_id_unique IF NOT EXISTS FOR (n:Source) REQUIRE n.id IS UNIQUE;
+MERGE (n:Entity {id:'Insulin'}) SET n.name='Insulin';
+MERGE (n:Entity {id:'Insulin hoặc thuốc hạ đường huyết'}) SET n.name='Insulin hoặc thuốc hạ đường huyết';
+MERGE (n:Entity {id:'Lối sống lành mạnh'}) SET n.name='Lối sống lành mạnh';
+MERGE (n:Entity {id:'Metformin'}) SET n.name='Metformin';
+MERGE (n:Entity {id:'Theo dõi biến chứng định kỳ'}) SET n.name='Theo dõi biến chứng định kỳ';
+MERGE (n:Entity {id:'Đái tháo đường'}) SET n.name='Đái tháo đường';
+MERGE (n:Entity {id:'Đái tháo đường típ 1'}) SET n.name='Đái tháo đường típ 1';
+MERGE (n:Entity {id:'Đái tháo đường típ 2'}) SET n.name='Đái tháo đường típ 2';
+MERGE (s:Source {id:'WHO-01'}) SET s.title='WHO – Diabetes', s.url='https://www.who.int/news-room/fact-sheets/detail/diabetes', s.publisher='World Health Organization', s.summary='Tổng quan về đái tháo đường, triệu chứng, biến chứng, phòng ngừa và điều trị.', s.kind='curated', s.curation='Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.', s.published_at='2026-11-03', s.checked_at='2026-11-06';
+MATCH (a:Entity {id:'Đái tháo đường típ 2'}), (b:Entity {id:'Metformin'}) MERGE (a)-[r:CAN_BE_TREATED_WITH {fact_id:'F027'}]->(b) SET r.source_id='WHO-01', r.evidence='Metformin là một trong các nhóm thuốc được sử dụng điều trị đái tháo đường típ 2 theo chỉ định của bác sĩ.', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (a:Entity {id:'Đái tháo đường típ 1'}), (b:Entity {id:'Insulin'}) MERGE (a)-[r:REQUIRES {fact_id:'F028'}]->(b) SET r.source_id='WHO-01', r.evidence='Người mắc đái tháo đường típ 1 cần insulin để duy trì sự sống.', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Lối sống lành mạnh'}) MERGE (a)-[r:CAN_BE_TREATED_WITH {fact_id:'F042'}]->(b) SET r.source_id='WHO-01', r.evidence='Đái tháo đường có thể được điều trị và quản lý bằng chế độ ăn, hoạt động thể chất và thuốc phù hợp.', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (a:Entity {id:'Đái tháo đường típ 2'}), (b:Entity {id:'Insulin hoặc thuốc hạ đường huyết'}) MERGE (a)-[r:CAN_BE_TREATED_WITH {fact_id:'F043'}]->(b) SET r.source_id='WHO-01', r.evidence='Một số người mắc đái tháo đường típ 2 cần insulin hoặc thuốc khác để kiểm soát đường huyết theo chỉ định chuyên môn.', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Theo dõi biến chứng định kỳ'}) MERGE (a)-[r:REQUIRES {fact_id:'F046'}]->(b) SET r.source_id='WHO-01', r.evidence='Sàng lọc biến chứng thường xuyên và điều trị kịp thời giúp hạn chế hậu quả của đái tháo đường.', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường típ 2'}) MERGE (s)-[r:SUPPORTS {fact_id:'F027'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường típ 1'}) MERGE (s)-[r:SUPPORTS {fact_id:'F028'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F042'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường típ 2'}) MERGE (s)-[r:SUPPORTS {fact_id:'F043'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_treatment.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F046'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_treatment.cypher';

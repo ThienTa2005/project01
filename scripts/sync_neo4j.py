@@ -29,17 +29,27 @@ def main():
                 for k in ("subject", "object"):
                     session.run("MERGE (e:Entity {id:$id}) SET e.name=$id", id=f[k]).consume()
             for src in d["sources"]:
-                session.run("MERGE (s:Source {id:$id}) SET s.title=$title,s.url=$url,s.publisher=$publisher", **{k:src[k] for k in ("id", "title", "url", "publisher")}).consume()
+                session.run(
+                    "MERGE (s:Source {id:$id}) "
+                    "SET s.title=$title,s.url=$url,s.publisher=$publisher,"
+                    "s.summary=$summary,s.kind=$kind,s.kb_files=$kb_files",
+                    id=src["id"], title=src["title"], url=src["url"],
+                    publisher=src["publisher"], summary=src.get("summary", ""),
+                    kind=src.get("kind", "cypher"), kb_files=src.get("kb_files", []),
+                ).consume()
             for f in d["facts"]:
                 pred = f["predicate"]
                 if not re.fullmatch("[A-Z_]+", pred):
                     raise ValueError("Predicate không hợp lệ")
-                q = f"MATCH (a:Entity {{id:$subject}}),(b:Entity {{id:$object}}) MERGE (a)-[r:{pred} {{fact_id:$fact_id}}]->(b) SET r.source_id=$source_id,r.evidence=$evidence"
+                q = f"MATCH (a:Entity {{id:$subject}}),(b:Entity {{id:$object}}) MERGE (a)-[r:{pred} {{fact_id:$fact_id}}]->(b) SET r.source_id=$source_id,r.evidence=$evidence,r.kb_file=$kb_file"
                 session.run(q, subject=f["subject"], object=f["object"], fact_id=f["id"],
-                            source_id=f["source_id"], evidence=f["evidence"]).consume()
+                            source_id=f["source_id"], evidence=f["evidence"],
+                            kb_file=f["kb_file"]).consume()
                 session.run("MATCH (s:Source {id:$source}),(e:Entity {id:$subject}) "
-                            "MERGE (s)-[:SUPPORTS {fact_id:$fact_id}]->(e)",
-                            source=f["source_id"], subject=f["subject"], fact_id=f["id"]).consume()
+                            "MERGE (s)-[r:SUPPORTS {fact_id:$fact_id}]->(e) "
+                            "SET r.source_id=$source,r.kb_file=$kb_file",
+                            source=f["source_id"], subject=f["subject"], fact_id=f["id"],
+                            kb_file=f["kb_file"]).consume()
             for src in d["sources"]:
                 if not src.get("body"):
                     continue
@@ -47,7 +57,7 @@ def main():
                     session.run("MATCH (s:Source {id:$source}),(e:Entity {id:$entity}) "
                                 "MERGE (s)-[:MENTIONS {mention_id:$mention_id}]->(e)",
                                 source=src["id"], entity=ent, mention_id=f"{src['id']}:{i}").consume()
-            print(f"Đã đồng bộ {len(d['sources'])} nguồn, {len(d['facts'])} quan hệ y khoa + provenance/mentions vào Neo4j database '{database}'.")
+            print(f"Đã đồng bộ trực tiếp {d['kb_files']}: {len(d['sources'])} nguồn, {len(d['facts'])} quan hệ y khoa + provenance/mentions vào Neo4j database '{database}'.")
 
 
 if __name__ == '__main__':

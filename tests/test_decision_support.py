@@ -3,6 +3,10 @@ import json
 from pathlib import Path
 
 from agents.runtime import DecisionSupportCoordinator
+from scripts.build_kb import KB_GROUPS
+
+
+EXPECTED_KB_FILES = sorted(KB_GROUPS)
 
 
 def patient_example():
@@ -24,6 +28,11 @@ def test_complete_runtime_agent_sequence_and_contract():
     required = {"request_id", "agent", "status", "payload", "evidence", "version", "error"}
     assert all(required <= set(item) for item in result["agents"])
     assert result["report"]["sources"]
+    kg = result["agent_results"]["KGRAGAgent"]
+    assert kg["payload"]["runtime_source"] == "cypher"
+    assert any(item.get("type") == "kb_file" for item in kg["evidence"])
+    assert result["report"]["knowledge_runtime_source"] == "cypher"
+    assert result["report"]["kb_files"] == EXPECTED_KB_FILES
     assert result["report"]["limitations"]
     assert any(flag["rule_id"] == "MODEL_RULE_CONFLICT" for flag in result["report"]["rule_flags"])
     audit_agents = result["agent_results"]["MonitoringAgent"]["payload"]["audit"]["agents"]

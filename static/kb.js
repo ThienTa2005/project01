@@ -85,19 +85,26 @@
   async function kbInfo(){
     const d=await api('/api/kb');
     const info=el('kb-stats');clear(info);
-    [['Thực thể',d.stats.entities],['Quan hệ',d.stats.relations],['Nguồn',d.stats.sources]].forEach(([n,v])=>{
+    [['Thực thể',d.stats.entities],['Quan hệ',d.stats.relations],['Nguồn',d.stats.sources],['File KB Cypher',(d.stats.kb_files||[]).length]].forEach(([n,v])=>{
       const card=document.createElement('div');card.className='metric-stat';
       lineText(card,'strong',v);lineText(card,'span',n);info.appendChild(card);
+    });
+    const downloads=el('kb-cypher-downloads');clear(downloads);
+    (d.stats.kb_files||[]).forEach(name=>{
+      const link=document.createElement('a');link.className='btn ghost';
+      link.href='/kb-diabetes/'+encodeURIComponent(name);link.download=name;
+      link.textContent=name.replace(/^kb_diabetes_|\.cypher$/g,'');downloads.appendChild(link);
     });
     const sources=el('kb-reference-list');clear(sources);
     d.sources.forEach(s=>{
       const div=document.createElement('div');div.className='well';div.style.marginBottom='8px';
-      lineText(div,'strong',`${s.id} · ${s.title}`);lineText(div,'p',s.summary,'small');aLink(div,s.url,s.url);sources.appendChild(div);
+      lineText(div,'strong',`${s.id} · ${s.title}`);lineText(div,'p',s.summary,'small');
+      lineText(div,'p',`KB: ${(s.kb_files||[]).join(', ')}`,'small');aLink(div,s.url,s.url);sources.appendChild(div);
     });
     const status=await api('/api/kb/neo4j');
     el('neo4j-status').textContent=status.connected
       ?`Neo4j đã kết nối: ${status.entity_nodes} thực thể / ${status.relationships} quan hệ (database).`
-      :`Neo4j chưa hoạt động trên server; dùng NetworkX. ${status.note||''}`;
+      :`Neo4j chưa hoạt động trên server; đọc KB Cypher và dựng NetworkX. ${status.note||''}`;
     el('neo4j-status').classList.toggle('success',!!status.connected);
     el('neo4j-status').classList.toggle('neutral',!status.connected);
   }
@@ -161,11 +168,11 @@
         ?'lỗi kết nối/quota Gemini'
         :(fallbackLabels[fallback]||'RAG offline');
       const generator=d.llm?.used?`Gemini · ${d.llm.model}`:`Offline · ${fallbackText}`;
-      chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'NetworkX'} · ${generator}`);
-      el('kb-answer').textContent=d.answer+'\n\n(Ý định: '+(d.intent||'general')+context+' · KG backend: '+(d.graph_backend||'NetworkX')+')';
+      chatBubble('assistant',d.answer,`${d.sources.length} nguồn · ${d.graph_backend||'KB Cypher'} · ${generator}`);
+      el('kb-answer').textContent=d.answer+'\n\n(Ý định: '+(d.intent||'general')+context+' · KB: '+(d.kb_files||[]).join(', ')+' · KG backend: '+(d.graph_backend||'KB Cypher')+')';
       const sn=el('kb-snippets');clear(sn);
       d.snippets.forEach(s=>{const w=document.createElement('div');w.className='well';w.style.margin='6px 0';
-        lineText(w,'div',`${s.source_id} · ${s.kind==='fact'?'Cạnh tri thức':'Tài liệu'} · Điểm ${s.score}`,'small');lineText(w,'p',s.text);sn.appendChild(w)});
+        lineText(w,'div',`${s.source_id} · ${s.kb_file||'tài liệu phiên'} · ${s.kind==='fact'?'Cạnh tri thức':'Tài liệu'} · Điểm ${s.score}`,'small');lineText(w,'p',s.text);sn.appendChild(w)});
       const source=el('kb-sources');clear(source);
       d.sources.forEach(s=>{const li=document.createElement('li');lineText(li,'strong',`${s.id} · ${s.title} — `);
         if(s.url)aLink(li,s.url,'Mở nguồn gốc');else lineText(li,'em','Nguồn file người dùng (không có URL)');source.appendChild(li)});

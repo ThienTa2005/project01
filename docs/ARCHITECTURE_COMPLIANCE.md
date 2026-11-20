@@ -10,7 +10,7 @@ Tài liệu này ánh xạ đặc tả kiến trúc sang mã chạy thực tế.
 | API and request processing | Flask `app.py`, endpoint `/api/decision-support` |
 | Multiagent coordination | `agents/runtime/coordinator.py` |
 | Intelligent agents | Các module độc lập trong `agents/runtime/` |
-| Knowledge and model | `models/diabetes_dl_v1.joblib`, `knowledge/`, Neo4j hoặc NetworkX fallback |
+| Knowledge and model | `models/diabetes_dl_v1.joblib`; runtime quét `knowledge/kb_*.cypher`, đồng bộ Neo4j hoặc dựng NetworkX từ Cypher |
 | Evaluation and audit | `MonitoringAgent`, `outputs/runtime_audit.jsonl`, dòng `MAS_AUDIT` trong service logs, pytest và model metadata |
 
 ## Agent responsibilities
@@ -20,7 +20,7 @@ Tài liệu này ánh xạ đặc tả kiến trúc sang mã chạy thực tế.
 | PatientDataAgent | Raw patient JSON | Validated and normalized features | Trả `invalid`; Coordinator dừng workflow |
 | DLPredictionAgent | Validated features | Score, threshold, flag, model metadata | `insufficient_data` hoặc lỗi model rõ ràng |
 | RuleBasedAgent | Features + DL result | Auditable flags, conflict and review flags | Không che giấu mâu thuẫn |
-| KGRAGAgent | Natural-language question | Evidence, sources, snippets, subgraph | Lỗi retrieval có cấu trúc |
+| KGRAGAgent | Natural-language question + mọi KB Cypher | Evidence, sources, snippets, subgraph kèm `kb_file` | Lỗi parse/retrieval có cấu trúc |
 | CoordinatorAgent | User request | Aggregated workflow result | Duy trì kết quả từng agent |
 | ExplanationAgent | Prediction + rules + evidence | Structured, evidence-grounded report | Luôn nêu giới hạn và trạng thái thiếu |
 | MonitoringAgent | Execution metadata | Privacy-minimized audit record | Audit write failure làm workflow `partial` |
@@ -50,7 +50,7 @@ Mỗi kết quả agent chứa:
 2. PatientDataAgent kiểm tra kiểu, miền giá trị, trường bắt buộc và tính nhất quán.
 3. Nếu hợp lệ, DLPredictionAgent chạy artifact MLP có phiên bản.
 4. RuleBasedAgent áp dụng luật minh bạch và phát hiện mâu thuẫn.
-5. KGRAGAgent truy xuất Vector/Graph/Hybrid với nguồn.
+5. KGRAGAgent quét trực tiếp các `kb_*.cypher`, truy xuất Vector/Graph/Hybrid và trả tên file KB trong provenance.
 6. ExplanationAgent tạo báo cáo gồm prediction, rule flags, evidence và limitations.
 7. MonitoringAgent ghi trạng thái, phiên bản, thời gian và SHA-256 của output; không ghi dữ liệu bệnh nhân.
 8. RLSimulationAgent chỉ chạy khi `simulate_rl=true` và chỉ trên trạng thái tổng hợp.

@@ -15,7 +15,7 @@ def _connection_settings():
 def neo4j_status():
     settings = _connection_settings()
     if not settings["uri"]:
-        return {"configured": False, "connected": False, "backend": "NetworkX", "note": "Chưa đặt NEO4J_URI; KB vẫn chạy nội bộ."}
+        return {"configured": False, "connected": False, "backend": "Cypher files → NetworkX", "note": "Chưa đặt NEO4J_URI; runtime vẫn đọc trực tiếp các file KB Cypher."}
     try:
         from neo4j import GraphDatabase
         with GraphDatabase.driver(settings["uri"], auth=(settings["user"], settings["password"]),
@@ -27,7 +27,7 @@ def neo4j_status():
         return {"configured": True, "connected": True, "backend": "Neo4j",
                 "database": settings["database"], "entity_nodes": n, "relationships": e}
     except Exception as exc:
-        return {"configured": True, "connected": False, "backend": "NetworkX", "note": f"Neo4j chưa kết nối ({exc.__class__.__name__}); xem Render Environment."}
+        return {"configured": True, "connected": False, "backend": "Cypher files → NetworkX", "note": f"Neo4j chưa kết nối ({exc.__class__.__name__}); runtime fallback về các file KB Cypher."}
 
 
 def fetch_neighbor_facts(entities, hops=2, limit=100):
@@ -52,7 +52,8 @@ def fetch_neighbor_facts(entities, hops=2, limit=100):
     WHERE (a.id IN $frontier OR b.id IN $frontier)
       AND r.fact_id IS NOT NULL AND r.source_id IS NOT NULL
     RETURN a.id AS subject, type(r) AS predicate, b.id AS object,
-           r.fact_id AS id, r.source_id AS source_id, r.evidence AS evidence
+           r.fact_id AS id, r.source_id AS source_id, r.evidence AS evidence,
+           r.kb_file AS kb_file
     LIMIT $limit
     """
     with GraphDatabase.driver(

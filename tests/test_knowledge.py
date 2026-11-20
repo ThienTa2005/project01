@@ -5,13 +5,21 @@ from pathlib import Path
 import pytest
 
 from knowledge.engine import (all_data, graph, graph_stats, find_path, retrieve,
-                              cypher_export, extract_mentions, validate_extra_docs)
+                              authoring_data, cypher_export, extract_mentions,
+                              validate_extra_docs)
+from knowledge.cypher_loader import load_cypher_kbs
 from knowledge.ingest import ingest_pdf, valid_domain
 from knowledge.assistant import ask
+from scripts.build_kb import KB_GROUPS, partition_data
+
+
+EXPECTED_KB_FILES = sorted(KB_GROUPS)
 
 
 def test_source_verifiable():
     d = all_data()
+    assert d['runtime_source'] == 'cypher'
+    assert d['kb_files'] == EXPECTED_KB_FILES
     assert len(d['sources']) >= 7
     src = {s['id']: s for s in d['sources']}
     assert len(d['facts']) >= 30
@@ -19,6 +27,41 @@ def test_source_verifiable():
         assert f['source_id'] in src
         assert src[f['source_id']]['url'].startswith('https://')
         assert f['evidence'] and f['subject'] and f['predicate'] and f['object']
+        assert f['kb_file'] in d['kb_files']
+
+
+def test_runtime_source_is_cypher_not_seed(monkeypatch):
+    import knowledge.engine as engine
+    engine.all_data.cache_clear()
+    monkeypatch.setattr(engine, 'seed_data', lambda: (_ for _ in ()).throw(
+        AssertionError('runtime must not read seed.json')
+    ))
+    data = engine.all_data()
+    assert data['runtime_source'] == 'cypher'
+    assert len(data['facts']) >= 30
+
+
+def test_loader_merges_multiple_kb_cypher_files():
+    fixture_dir = Path(__file__).parent / 'fixtures' / 'cypher_kbs'
+    data = load_cypher_kbs(fixture_dir)
+    assert data['kb_files'] == ['kb_part_1.cypher', 'kb_part_2.cypher']
+    assert {fact['kb_file'] for fact in data['facts']} == set(data['kb_files'])
+    assert len(data['sources']) == 2 and len(data['facts']) == 2
+
+
+def test_medical_build_partitions_every_fact_once():
+    partitions = partition_data(authoring_data())
+    counts = {name: len(part['facts']) for name, part in partitions.items()}
+    assert counts == {
+        'kb_diabetes_core.cypher': 8,
+        'kb_diabetes_symptoms.cypher': 6,
+        'kb_diabetes_risk_prevention.cypher': 10,
+        'kb_diabetes_diagnosis.cypher': 9,
+        'kb_diabetes_complications.cypher': 8,
+        'kb_diabetes_treatment.cypher': 5,
+    }
+    ids = [fact['id'] for part in partitions.values() for fact in part['facts']]
+    assert len(ids) == len(set(ids)) == 46
 
 
 def test_graph_has_links_and_provenance():
@@ -35,6 +78,9 @@ def test_rag_modes(mode):
     assert r['sources']
     assert r['snippets']
     assert all(s['source_id'] for s in r['snippets'])
+    assert r['runtime_source'] == 'cypher'
+    assert all(s['kb_file'] in EXPECTED_KB_FILES
+               for s in r['snippets'] if s['kind'] == 'fact')
     assert 'không gọi LLM' in r['answer_mode']
 
 
@@ -62,6 +108,9 @@ def test_cypher_script_and_graphml_exist():
     s=cypher_export()
     assert 'CREATE CONSTRAINT' in s and ':Source' in s and ':SUPPORTS' in s
     assert ':HAS_SYMPTOM' in s
+    for name in EXPECTED_KB_FILES:
+        kb = Path('knowledge') / name
+        assert kb.exists() and kb.stat().st_size > 500
     g=Path('knowledge/kb_diabetes.graphml')
     assert g.exists() and g.stat().st_size>2000
 

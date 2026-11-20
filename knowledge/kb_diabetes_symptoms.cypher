@@ -1,0 +1,25 @@
+// Runtime KB: dữ kiện có source_id, evidence và kb_file.
+CREATE CONSTRAINT entity_id_unique IF NOT EXISTS FOR (n:Entity) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT source_id_unique IF NOT EXISTS FOR (n:Source) REQUIRE n.id IS UNIQUE;
+MERGE (n:Entity {id:'Khát nhiều'}) SET n.name='Khát nhiều';
+MERGE (n:Entity {id:'Mệt mỏi'}) SET n.name='Mệt mỏi';
+MERGE (n:Entity {id:'Nhìn mờ'}) SET n.name='Nhìn mờ';
+MERGE (n:Entity {id:'Sụt cân không chủ ý'}) SET n.name='Sụt cân không chủ ý';
+MERGE (n:Entity {id:'Tiểu nhiều'}) SET n.name='Tiểu nhiều';
+MERGE (n:Entity {id:'Vết thương chậm lành'}) SET n.name='Vết thương chậm lành';
+MERGE (n:Entity {id:'Đái tháo đường'}) SET n.name='Đái tháo đường';
+MERGE (s:Source {id:'CDC-01'}) SET s.title='CDC – Symptoms of Diabetes', s.url='https://www.cdc.gov/diabetes/signs-symptoms/', s.publisher='US CDC', s.summary='Các dấu hiệu tiểu đường có thể nhận biết.', s.kind='curated', s.curation='Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.', s.published_at='2024-05-15', s.checked_at='2026-11-06';
+MERGE (s:Source {id:'VIN-01'}) SET s.title='Vinmec – Dấu hiệu sớm báo hiệu bệnh tiểu đường', s.url='https://www.vinmec.com/vie/bai-viet/dau-hieu-som-bao-hieu-benh-tieu-duong-vi', s.publisher='Vinmec', s.summary='Tổng hợp các dấu hiệu gợi ý và thời điểm nên tầm soát.', s.kind='curated', s.curation='Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.', s.published_at='2026-09-07', s.checked_at='2026-11-06';
+MERGE (s:Source {id:'WHO-01'}) SET s.title='WHO – Diabetes', s.url='https://www.who.int/news-room/fact-sheets/detail/diabetes', s.publisher='World Health Organization', s.summary='Tổng quan về đái tháo đường, triệu chứng, biến chứng, phòng ngừa và điều trị.', s.kind='curated', s.curation='Tóm lược thủ công từ nguồn công khai; không phải dữ liệu huấn luyện ML.', s.published_at='2026-11-03', s.checked_at='2026-11-06';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Khát nhiều'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F001'}]->(b) SET r.source_id='CDC-01', r.evidence='Khát nước nhiều là một trong các dấu hiệu thường gặp của bệnh đái tháo đường.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Tiểu nhiều'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F002'}]->(b) SET r.source_id='CDC-01', r.evidence='Đi tiểu thường xuyên là dấu hiệu có thể gặp ở người mắc đái tháo đường.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Mệt mỏi'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F003'}]->(b) SET r.source_id='CDC-01', r.evidence='Người mắc đái tháo đường có thể xuất hiện tình trạng mệt mỏi.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Nhìn mờ'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F004'}]->(b) SET r.source_id='CDC-01', r.evidence='Nhìn mờ có thể là triệu chứng của tăng đường huyết.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Sụt cân không chủ ý'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F005'}]->(b) SET r.source_id='WHO-01', r.evidence='Sụt cân không chủ ý có thể xuất hiện ở một số người mắc đái tháo đường.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (a:Entity {id:'Đái tháo đường'}), (b:Entity {id:'Vết thương chậm lành'}) MERGE (a)-[r:HAS_SYMPTOM {fact_id:'F006'}]->(b) SET r.source_id='VIN-01', r.evidence='Vết thương lâu lành là dấu hiệu cần lưu ý khi đánh giá bệnh đái tháo đường.', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'CDC-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F001'}]->(e) SET r.source_id='CDC-01', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'CDC-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F002'}]->(e) SET r.source_id='CDC-01', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'CDC-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F003'}]->(e) SET r.source_id='CDC-01', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'CDC-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F004'}]->(e) SET r.source_id='CDC-01', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'WHO-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F005'}]->(e) SET r.source_id='WHO-01', r.kb_file='kb_diabetes_symptoms.cypher';
+MATCH (s:Source {id:'VIN-01'}), (e:Entity {id:'Đái tháo đường'}) MERGE (s)-[r:SUPPORTS {fact_id:'F006'}]->(e) SET r.source_id='VIN-01', r.kb_file='kb_diabetes_symptoms.cypher';

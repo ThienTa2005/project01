@@ -10,6 +10,7 @@ import service
 from agents.runtime import DecisionSupportCoordinator
 from config import ROOT
 from knowledge.engine import all_data, graph_stats, find_path, graph, extract_mentions
+from knowledge.cypher_loader import cypher_kb_files
 from knowledge.gemini import gemini_status
 from knowledge.assistant import ask as ask_kb
 from knowledge.neo4j_store import neo4j_status
@@ -106,7 +107,8 @@ def kb_graph():
                            "label": attrs.get("name", n)} for n, attrs in graph().nodes(data=True)],
                    edges=[{"source": a, "target": b,
                            "relation": attrs.get("predicate", "RELATED_TO"),
-                           "source_id": attrs.get("source_id", "")}
+                           "source_id": attrs.get("source_id", ""),
+                           "kb_file": attrs.get("kb_file")}
                           for a, b, attrs in graph().edges(data=True)])
 
 
@@ -124,7 +126,9 @@ def kb_neo4j():
 
 @app.get("/kb-diabetes/<name>")
 def download_kb(name):
-    if name not in {"kb_diabetes.cypher", "kb_diabetes.graphml"}:
+    allowed = {path.name for path in cypher_kb_files(ROOT / "knowledge")}
+    allowed.add("kb_diabetes.graphml")
+    if name not in allowed:
         return jsonify(error="File không tồn tại."), 404
     return send_from_directory(ROOT / "knowledge", name, as_attachment=True)
 

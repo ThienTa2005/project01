@@ -10,19 +10,19 @@ I. ĐỌC VÀ DIỄN GIẢI ẢNH CHỤP BẢNG
 Đối chiếu từng ý với project hiện tại:
 - “Web/PDF -> KB”: ĐÃ CÓ và chạy được. Web chỉ nhận các tên miền y khoa cho phép; PDF phải có lớp text. Nguồn mới chỉ tự sinh MENTIONS, không tự bịa quan hệ y khoa.
 - “Image -> KB”: CHƯA CÓ OCR. Không được nói hệ thống đã đọc ảnh/PDF scan. Muốn hoàn thành phải thêm một OCR engine có thể triển khai và kiểm thử tiếng Việt/Anh; hiện tại ảnh chỉ là phần chưa triển khai.
-- “Show KB Neo4j”: ĐÃ CÓ file Cypher, GraphML, script sync và runtime đọc Neo4j; nhưng CHƯA THỂ KHẲNG ĐỊNH Neo4j thật đang chạy nếu chưa cấu hình NEO4J_URI/credentials và sync dữ liệu. Mặc định dùng NetworkX.
-- “KB chatbot lưu ở đâu?”: Fact và metadata nguồn lưu ở knowledge/seed.json (và knowledge/extra_sources.json nếu nhập bền vững); graph mặc định dựng trong RAM bằng NetworkX; có thể đồng bộ sang Neo4j. Chatbot không lưu lịch sử hội thoại server-side. Tài liệu người dùng tải trên web chỉ nằm ở biến JavaScript của phiên trang và được gửi kèm request RAG.
+- “Show KB Neo4j”: ĐÃ CÓ nhiều-file loader cho `knowledge/kb_*.cypher`, GraphML, script sync và runtime đọc Neo4j; nếu chưa cấu hình Neo4j thì NetworkX được dựng trực tiếp từ chính các file Cypher.
+- “KB chatbot lưu ở đâu?”: Nguồn sự thật runtime là các file `knowledge/kb_*.cypher`; mỗi fact có `source_id`, `evidence`, `kb_file`. `seed.json`/`extra_sources.json` chỉ là đầu vào biên soạn để tạo lại Cypher, không được RAG đọc trực tiếp. Chatbot không lưu lịch sử hội thoại server-side. Tài liệu người dùng tải trên web chỉ nằm trong phiên và được gửi kèm request RAG.
 - “Code RAG + link DB?”: ĐÃ CÓ. knowledge/engine.py thực hiện Vector/Graph/Hybrid retrieval; knowledge/neo4j_store.py đọc cạnh Neo4j bằng truy vấn có tham số; knowledge/assistant.py điều phối; app.py cung cấp API.
 - “DB (dataset) -> DL”: Dữ liệu -> pipeline HUẤN LUYỆN đã có, nhưng đó là Machine Learning cổ điển (Logistic Regression, Random Forest, HistGradientBoosting), KHÔNG phải Deep Learning. Nếu chữ “DL” trên bảng có nghĩa Deep Learning thì project chưa có CNN/MLP/TensorFlow/PyTorch và không được trình bày là đã có.
 
 KẾT LUẬN KIỂM TRA: project đã trả lời tốt phần KG + RAG + chatbot + pipeline ML, nhưng chỉ hoàn thành một phần yêu cầu nếu giảng viên bắt buộc “image/OCR”, “Neo4j live” hoặc “Deep Learning”. Bản hiện tại minh bạch các giới hạn này, không đánh tráo NetworkX thành Neo4j, ML thành DL, hay PDF text thành OCR.
 
 Kiểm chứng đã chạy ngày 06/11/2026:
-- python -m scripts.build_kb: thành công; 46 thực thể, 46 quan hệ, 7 nguồn, 53 graph nodes.
+- python -m scripts.build_kb: thành công; tạo 6 KB theo chủ đề, tổng 46 thực thể, 46 quan hệ, 7 nguồn, 53 graph nodes.
 - python predict.py --input examples/patient_example.json: thành công; 3/3 agent trả kết quả, hội đồng biểu quyết.
 - python make_report.py: thành công.
-- pytest -q: 27 passed.
-- Các URL WHO, NIDDK/NIH, CDC và Vinmec chính trong seed.json mở được; ví dụ NIDDK xác nhận HbA1c từ 6,5% và thường cần xét nghiệm thứ hai để xác nhận.
+- pytest không phụ thuộc Gemini: 35 passed (kiểm chứng ngày 20/11/2026).
+- Các URL WHO, NIDDK/NIH, CDC và Vinmec được nhúng trong Source nodes của KB Cypher; ví dụ NIDDK xác nhận HbA1c từ 6,5% và thường cần xét nghiệm thứ hai để xác nhận.
 - Đã sửa lỗi mã hóa console khiến các CLI tiếng Việt trước đó kết thúc UnicodeEncodeError trên Windows.
 
 Các ý chính thầy muốn thấy là: tri thức đến từ đâu; được trích xuất và lưu thành graph như thế nào; Neo4j có dữ liệu thật hay chỉ là hình vẽ; RAG lấy tri thức trong KG bằng cách nào; chatbot và các agent xử lý yêu cầu ra sao; dữ liệu nào được dùng để HUẤN LUYỆN ML, dữ liệu nào chỉ dùng để TRUY XUẤT tri thức.
@@ -39,9 +39,9 @@ Có sẵn trong ZIP gốc:
 
 III. NHỮNG GÌ ĐÃ BỔ SUNG TRONG BẢN NÀY
 --------------------------------------
-- knowledge/seed.json: 7 nguồn web xác minh được (WHO, NIDDK/NIH, CDC, Vinmec), 46 mệnh đề có nguồn rõ ràng. Đây là TRI THỨC BIÊN TẬP, không phải mô hình ML được huấn luyện bằng web đó.
-- knowledge/engine.py: đồ thị NetworkX gồm 46 thực thể, 46 quan hệ y khoa và cạnh provenance (SUPPORTS) từ nguồn -> thực thể; Vector RAG kết hợp TF-IDF từ/ký tự, mở rộng đồng nghĩa và ý định; GraphRAG duyệt entity và lân cận; Hybrid kết hợp điểm alpha.
-- knowledge/kb_diabetes.cypher: file MERGE node Entity/Source, cạnh quan hệ bệnh học và SUPPORTS.
+- knowledge/kb_diabetes_*.cypher: 6 KB theo chủ đề, là nguồn sự thật runtime; tổng cộng 7 nguồn web và 46 mệnh đề có `source_id`, `evidence`, `kb_file`.
+- knowledge/cypher_loader.py + engine.py: quét nhiều file Cypher, kiểm tra ID/provenance, dựng NetworkX fallback; Vector RAG kết hợp TF-IDF từ/ký tự; GraphRAG duyệt entity/lân cận; Hybrid kết hợp điểm alpha.
+- knowledge/seed.json: đầu vào BIÊN SOẠN để tái tạo Cypher, không phải nguồn mà agent đọc khi chạy và không phải dữ liệu huấn luyện ML.
 - knowledge/kb_diabetes.graphml: đồ thị để đọc bằng NetworkX/Gephi.
 - scripts/build_kb.py: dựng lại các file graph từ nguồn JSON.
 - scripts/ingest_source.py: nạp thêm trang web được cho phép hoặc PDF văn bản vào knowledge/extra_sources.json; sinh quan hệ MENTIONS từ document tới thực thể; sau đó build lại graph.
@@ -55,7 +55,7 @@ IV. TRẢ LỜI CÂU 1: “SHOW KB NEO4J” – KB NẰM Ở ĐÂU?
 ---------------------------------------------------
 Hiện tại có hai cách:
 A. Mặc định không cần máy chủ database: Knowledge Graph chạy bằng NetworkX trong Python. Trên website vào “Đồ thị Knowledge Graph”, chọn thực thể và xem các cạnh; tải file knowledge/kb_diabetes.graphml.
-B. Dùng Neo4j thật: file knowledge/kb_diabetes.cypher được tạo sẵn và có script scripts/sync_neo4j.py để ghi node/edge vào Neo4j. Cần CẤU HÌNH Neo4j Aura/DB và credentials; nếu chưa cấu hình, KHÔNG được nói “web đang dùng Neo4j”. Khi đã cấu hình và sync, GraphQueryAgent ưu tiên truy vấn Neo4j trực tiếp (chỉ đọc); nếu lỗi/thiếu dữ liệu thì fallback NetworkX và hiển thị nhãn backend thực tế.
+B. Dùng Neo4j thật: 6 file `knowledge/kb_diabetes_*.cypher` được build theo chủ đề và script `scripts/sync_neo4j.py` nạp toàn bộ node/edge. Cần CẤU HÌNH Neo4j Aura/DB và credentials; nếu chưa cấu hình, KHÔNG được nói “web đang dùng Neo4j”. Khi đã cấu hình và sync, GraphQueryAgent ưu tiên truy vấn Neo4j trực tiếp (chỉ đọc); nếu lỗi/thiếu dữ liệu thì fallback NetworkX từ chính 6 file Cypher.
 
 Lệnh dựng file graph:
   python -m scripts.build_kb
@@ -90,9 +90,9 @@ Luồng đúng là:
        -> xác định tên thực thể theo ontology hiện có
        -> kết nối Document -MENTIONS-> Entity
        -> người biên tập kiểm tra các mệnh đề y khoa nếu muốn thêm quan hệ thật
-       -> lưu trong seed.json/extra_sources.json
-       -> xuất Cypher/GraphML, tùy chọn đồng bộ lên Neo4j
-       -> RAG dùng kho này làm căn cứ trả lời.
+       -> biên soạn trong seed.json/extra_sources.json
+       -> xuất thành một hoặc nhiều file kb_*.cypher + GraphML
+       -> runtime RAG chỉ đọc các file Cypher; tùy chọn đồng bộ cùng dữ liệu đó lên Neo4j.
 
 Với 46 quan hệ y khoa dựng sẵn: nhóm đã tổng hợp thành các fact “Chủ thể – Quan hệ – Đối tượng – Diễn giải – Mã nguồn”, ví dụ:
   Đái tháo đường --HAS_COMPLICATION--> Bệnh thận do đái tháo đường [WHO-01]
@@ -122,8 +122,8 @@ A. HUẤN LUYỆN MÔ HÌNH ML (training):
 
 B. XÂY KHO TRI THỨC (KHÔNG phải training neural network):
 - Tài liệu WHO/NIDDK/CDC/Vinmec và PDF mới được đọc/trích thông tin.
-- Dữ kiện đã biên tập ở knowledge/seed.json; thêm nguồn ở knowledge/extra_sources.json.
-- scripts/build_kb.py tạo graph để phục vụ tìm kiếm và trả lời.
+- Dữ kiện được biên tập ở seed.json/extra_sources.json rồi bắt buộc xuất thành `kb_*.cypher`.
+- scripts/build_kb.py tạo KB Cypher/GraphML; agent chỉ dùng dữ kiện sau khi đã có trong Cypher.
 - Không gọi đây là fine-tuning hay huấn luyện LLM. Một KB lưu các mệnh đề, không phải tập trọng số của mô hình.
 
 VII. TRẢ LỜI CÂU 4: “RAG <-> KB THẾ NÀO?”
@@ -196,8 +196,8 @@ XII. VỊ TRÍ CODE CẦN CHỈ KHI GIẢNG VIÊN HỎI
 - Data training: config.py, main.py, agents/data_agent.py, agents/model_agent.py.
 - Multi-agent training control: agents/base.py, agents/orchestrator.py, agents/evaluator_agent.py.
 - Predict web: service.py -> predict(); models/*.joblib.
-- Knowledge base: knowledge/seed.json, knowledge/extra_sources.json.
-- Graph build & export: knowledge/engine.py, scripts/build_kb.py, knowledge/kb_diabetes.cypher, knowledge/kb_diabetes.graphml.
+- Knowledge base runtime: mọi `knowledge/kb_*.cypher`; authoring input: `seed.json`, `extra_sources.json`.
+- Cypher load/build/export: knowledge/cypher_loader.py, knowledge/engine.py, scripts/build_kb.py, knowledge/kb_diabetes.graphml.
 - Neo4j: scripts/sync_neo4j.py, knowledge/neo4j_store.py.
 - Web/PDF ingestion: knowledge/ingest.py, scripts/ingest_source.py.
 - Vector, Graph, Hybrid RAG: knowledge/engine.py -> retrieve().

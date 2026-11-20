@@ -1,8 +1,8 @@
-"""Triển khai KB + Vector RAG + GraphRAG + Hybrid không phụ thuộc LLM.
+"""KB Cypher runtime + Vector RAG + GraphRAG + Hybrid không phụ thuộc LLM.
 
-Các mệnh đề trong seed.json được biên tập từ nguồn có URL. Tài liệu tự tải lên
-chỉ được nối với các THỰC THỂ ĐƯỢC NHẮC ĐẾN (MENTIONS), tuyệt đối không tự
-suy diễn quan hệ y khoa từ đoạn văn không qua kiểm chứng.
+Runtime chỉ nạp các file ``kb_*.cypher``. ``seed.json`` là dữ liệu biên soạn
+để tạo lại Cypher, không được retrieval đọc trực tiếp. Tài liệu phiên chỉ nối
+với thực thể được nhắc đến (MENTIONS), không tự suy diễn quan hệ y khoa.
 """
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ import networkx as nx
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from .cypher_loader import load_cypher_kbs
+
 ROOT = Path(__file__).resolve().parent
 SEED = ROOT / "seed.json"
 MAX_EXTRA_DOCUMENTS = 3
@@ -34,12 +36,13 @@ def normalize(text: str) -> str:
 
 @lru_cache(maxsize=1)
 def seed_data():
+    """Authoring input only; runtime retrieval must use :func:`all_data`."""
     return json.loads(SEED.read_text(encoding="utf-8"))
 
 
 @lru_cache(maxsize=1)
-def all_data():
-    """Nguồn biên tập + nguồn web/PDF đã nhập qua CLI (phân biệt độ tin cậy)."""
+def authoring_data():
+    """JSON authoring material used only to rebuild distributable Cypher KBs."""
     base = seed_data()
     path = ROOT / "extra_sources.json"
     extras = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
@@ -49,17 +52,21 @@ def all_data():
 
 
 @lru_cache(maxsize=1)
-def graph():
-    """Tạo đồ thị NetworkX từ các quan hệ đã biên tập; không cần Neo4j."""
+def all_data():
+    """Runtime source of truth: every ``knowledge/kb_*.cypher`` file."""
+    return load_cypher_kbs(ROOT)
+
+
+def _graph_from_data(data):
+    """Build the local graph projection from already parsed Cypher data."""
     G = nx.MultiDiGraph()
-    data = all_data()
     for fact in data["facts"]:
         s, o = fact["subject"], fact["object"]
         G.add_node(s, name=s, kind="Entity")
         G.add_node(o, name=o, kind="Entity")
         G.add_edge(s, o, key=fact["id"], predicate=fact["predicate"],
                    source_id=fact["source_id"], fact_id=fact["id"],
-                   evidence=fact["evidence"])
+                   evidence=fact["evidence"], kb_file=fact["kb_file"])
     for src in data["sources"]:
         node = f"SOURCE:{src['id']}"
         G.add_node(node, name=src["title"], kind="Source", url=src["url"])
@@ -69,7 +76,7 @@ def graph():
         G.add_edge(f"SOURCE:{fact['source_id']}", fact["subject"],
                    key=f"SUPPORTS:{fact['id']}", predicate="SUPPORTS",
                    fact_id=fact["id"], source_id=fact["source_id"],
-                   evidence=fact["evidence"])
+                   evidence=fact["evidence"], kb_file=fact["kb_file"])
     for src in data["sources"]:
         if src.get("kind") == "curated" or not src.get("body"):
             continue
@@ -77,17 +84,27 @@ def graph():
             G.add_edge(f"SOURCE:{src['id']}", entity,
                        key=f"MENTIONS:{src['id']}:{i}", predicate="MENTIONS",
                        fact_id=f"MENTIONS:{i}", source_id=src["id"],
-                       evidence="Chỉ phát hiện nhắc đến thực thể, chưa xác thực quan hệ.")
+                       evidence="Chỉ phát hiện nhắc đến thực thể, chưa xác thực quan hệ.",
+                       kb_file=(src.get("kb_files") or [None])[0])
     return G
+
+
+@lru_cache(maxsize=1)
+def graph():
+    """Create NetworkX fallback exclusively from parsed Cypher KB files."""
+    return _graph_from_data(all_data())
 
 
 def graph_stats():
     g = graph()
+    data = all_data()
     return {"entities": sum(d.get("kind") == "Entity" for _, d in g.nodes(data=True)),
-            "sources": len(all_data()["sources"]),
-            "relations": len(seed_data()["facts"]),
+            "sources": len(data["sources"]),
+            "relations": len(data["facts"]),
             "graph_nodes": g.number_of_nodes(),
-            "storage": "NetworkX (mặc định) / Neo4j tùy chọn"}
+            "kb_files": data["kb_files"],
+            "runtime_source": "cypher",
+            "storage": "Cypher files → NetworkX (mặc định) / Neo4j tùy chọn"}
 
 
 def _keywords(text: str):
@@ -281,7 +298,7 @@ def extract_mentions(text: str):
     """Trích xuất entity mention theo ontology hiện có (không tự suy luận quan hệ bệnh học)."""
     n = normalize(text)
     mentions = []
-    entities = {f[k] for f in seed_data()["facts"] for k in ("subject", "object")}
+    entities = {f[k] for f in all_data()["facts"] for k in ("subject", "object")}
     for entity in sorted(entities):
         if len(normalize(entity)) > 3 and normalize(entity) in n:
             mentions.append(entity)
@@ -351,21 +368,28 @@ def intent_bonus(question: str, fact: dict) -> float:
 def _graph_candidates(question, facts, hops, limit):
     ents = selected_entities(question)
     if not ents:
-        return [], "NetworkX"
+        return [], "Cypher files → NetworkX"
     # Neo4j được dùng trực tiếp khi đã cấu hình. Nếu lỗi/missing data,
     # fallback NetworkX phải ghi nhãn rõ, không tuyên bố đang dùng Neo4j.
-    graph_backend = "NetworkX"
+    graph_backend = "Cypher files → NetworkX"
     try:
         from .neo4j_store import fetch_neighbor_facts
         neo_facts = fetch_neighbor_facts(ents, hops=hops, limit=150)
         if neo_facts:
-            allowed = {f["id"] for f in facts}
-            validated = [f for f in neo_facts if f["id"] in allowed]
+            local_by_id = {f["id"]: f for f in facts}
+            validated = [
+                {
+                    **local_by_id[f["id"]],
+                    **f,
+                    "kb_file": f.get("kb_file") or local_by_id[f["id"]]["kb_file"],
+                }
+                for f in neo_facts if f["id"] in local_by_id
+            ]
             if validated:
                 facts = validated
                 graph_backend = "Neo4j"
     except Exception:
-        graph_backend = "NetworkX (Neo4j lỗi/kết nối thất bại)"
+        graph_backend = "Cypher files → NetworkX (Neo4j lỗi/kết nối thất bại)"
     g = graph()
     # Lấy vùng lân cận 1..hops; điểm cộng nếu thực thể chính/quan hệ nhắc trong câu.
     g_simple = nx.Graph()
@@ -474,6 +498,7 @@ def retrieve(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extra_docume
             "snippets": [], "sources": [], "subgraph": {"nodes": [], "edges": []},
             "entity_matches": [], "intent": "smalltalk", "context_used": False,
             "effective_question": question.strip(),
+            "kb_files": data["kb_files"], "runtime_source": "cypher",
             "trace": [{
                 "agent": "ConversationRouter",
                 "action": "Nhận diện hội thoại xã giao",
@@ -484,10 +509,11 @@ def retrieve(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extra_docume
     if not profile["in_scope"] and not validated_extras:
         return {"question": question, "method": method, "top_k": top_k, "hops": hops, "alpha": alpha,
                 "answer": "Câu hỏi nằm ngoài phạm vi kho tri thức về đái tháo đường; không đủ nguồn để trả lời.",
-                "answer_mode": "extractive-offline (không gọi LLM)", "graph_backend": "NetworkX", "snippets": [], "sources": [],
+                "answer_mode": "extractive-offline (không gọi LLM)", "graph_backend": "Cypher files → NetworkX", "snippets": [], "sources": [],
                 "subgraph": {"nodes": [], "edges": []}, "entity_matches": [],
                 "intent": profile["primary_intent"], "context_used": profile["context_used"],
                 "effective_question": profile["effective_question"],
+                "kb_files": data["kb_files"], "runtime_source": "cypher",
                 "trace": [{"agent":"QueryRouter", "action":"Từ chối ngoài phạm vi", "detail":"Chỉ số Diabetes"}]}
     query = profile["expanded_query"]
     v = _vector_candidates(query, facts, docs, 30, profile)
@@ -516,18 +542,20 @@ def retrieve(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extra_docume
             sr = source_by_id[item["source_id"]]
             snippet = item["evidence"]
             edges.append({"source": item["subject"], "target": item["object"],
-                          "relation": item["predicate"], "source_id": item["source_id"]})
+                          "relation": item["predicate"], "source_id": item["source_id"],
+                          "kb_file": item["kb_file"]})
         else:
             sr = item
-            snippet = (item.get("summary") if item.get("kind") == "web" else item.get("body", "")[:450]) or ""
+            snippet = (item.get("body") or item.get("summary") or "")[:450]
             if sr["id"].startswith("SESSION"):
                 for mention in extract_mentions(item.get("body", ""))[:8]:
                     edges.append({"source": sr["title"], "target": mention,
                                   "relation": "MENTIONS (tự động)", "source_id": sr["id"]})
-        sources[sr["id"]] = {k: sr.get(k) for k in ("id", "title", "publisher", "url", "kind")}
+        sources[sr["id"]] = {k: sr.get(k) for k in ("id", "title", "publisher", "url", "kind", "kb_files")}
         snippets.append({"id": item["id"], "kind": e["kind"], "text": snippet,
                          "source_id": sr["id"], "score": round(e["score"], 4),
                          "vector_score": e["vector_score"], "graph_score": e["graph_score"],
+                         "kb_file": item.get("kb_file") if e["kind"] == "fact" else None,
                          "subject": item.get("subject") if e["kind"] == "fact" else None,
                          "predicate": item.get("predicate") if e["kind"] == "fact" else None,
                          "object": item.get("object") if e["kind"] == "fact" else None})
@@ -542,22 +570,23 @@ def retrieve(question, method="hybrid", top_k=5, hops=2, alpha=0.5, extra_docume
             "subgraph": {"nodes": [{"id": x} for x in nodes], "edges": edges},
             "entity_matches": profile["entities"], "intent": profile["primary_intent"],
             "context_used": profile["context_used"], "effective_question": profile["effective_question"],
+            "kb_files": data["kb_files"], "runtime_source": "cypher",
             "trace": [
                 {"agent": "QueryRouter", "action": "Nhận câu hỏi; nhận diện ý định/ngữ cảnh", "detail": f"{method} · {profile['primary_intent']}"},
                 {"agent": "LanguageUnderstandingAgent", "action": "Mở rộng đồng nghĩa và câu hỏi nối tiếp", "detail": "Có dùng ngữ cảnh" if profile["context_used"] else "Câu hỏi độc lập"},
                 {"agent": "VectorSearchAgent", "action": "Word + character TF-IDF retrieval", "detail": f"{len(v)} ứng viên", "used": method != "graph"},
-                {"agent": "GraphQueryAgent", "action": "KG query entity/hops", "detail": f"{len(g)} quan hệ · backend {graph_backend}", "used": method != "vector"},
+                {"agent": "GraphQueryAgent", "action": "Truy vấn các KB Cypher theo entity/hops", "detail": f"{len(g)} quan hệ · {', '.join(data['kb_files'])} · backend {graph_backend}", "used": method != "vector"},
                 {"agent": "FusionAgent", "action": "Xếp hạng/ngắt top-k", "detail": f"{len(snippets)} bằng chứng"},
                 {"agent": "AnswerAgent", "action": "Trích rút và gắn nguồn", "detail": "Không tự sinh kiến thức không có nguồn"},
             ]}
 
 
 def find_path(start, end, hops=3):
-    """Đường đi nhiều chặng trong KG đã được biên tập (không duyệt document shortcut)."""
+    """Đường đi nhiều chặng từ các fact đã nạp trong KB Cypher."""
     g = nx.Graph()
-    for fact in seed_data()["facts"]:
+    for fact in all_data()["facts"]:
         g.add_edge(fact["subject"], fact["object"], predicate=fact["predicate"],
-                   source_id=fact["source_id"])
+                   source_id=fact["source_id"], kb_file=fact["kb_file"])
     aliases = {normalize(node): node for node in g.nodes}
     for a, b in ALIASES.items():
         if b in g:
@@ -579,27 +608,39 @@ def escape_cypher(s):
     return "'" + str(s).replace('\\', '\\\\').replace("'", "\\'").replace("\n", " ") + "'"
 
 
-def cypher_export(data=None):
-    """Script MERGE chạy được trên Neo4j (đủ mệnh đề + provenance)."""
-    data = data or all_data()
-    lines = ["// Sinh từ knowledge/seed.json; dữ kiện có provenance.",
+def cypher_export(data=None, kb_file="kb_generated.cypher"):
+    """Build a runtime KB Cypher script with source and file provenance."""
+    data = data or authoring_data()
+    lines = ["// Runtime KB: dữ kiện có source_id, evidence và kb_file.",
              "CREATE CONSTRAINT entity_id_unique IF NOT EXISTS FOR (n:Entity) REQUIRE n.id IS UNIQUE;",
              "CREATE CONSTRAINT source_id_unique IF NOT EXISTS FOR (n:Source) REQUIRE n.id IS UNIQUE;"]
     ent = sorted({f["subject"] for f in data["facts"]} | {f["object"] for f in data["facts"]})
     for x in ent:
         lines.append(f"MERGE (n:Entity {{id:{escape_cypher(x)}}}) SET n.name={escape_cypher(x)};")
     for src in data["sources"]:
-        lines.append("MERGE (s:Source {id:" + escape_cypher(src["id"]) + "}) SET s.title=" + escape_cypher(src["title"]) + ", s.url=" + escape_cypher(src["url"]) + ", s.publisher=" + escape_cypher(src["publisher"]) + ";")
+        props = [("title", src["title"]), ("url", src["url"]),
+                 ("publisher", src["publisher"]),
+                 ("summary", src.get("summary", src["title"])),
+                 ("kind", src.get("kind", "curated"))]
+        props.extend(
+            (key, src[key]) for key in ("curation", "published_at", "checked_at", "body")
+            if src.get(key) is not None
+        )
+        assignments = ", ".join(f"s.{key}={escape_cypher(value)}" for key, value in props)
+        lines.append("MERGE (s:Source {id:" + escape_cypher(src["id"]) + "}) SET " + assignments + ";")
     for f in data["facts"]:
         p = f["predicate"]
         assert re.fullmatch(r"[A-Z_]+", p)
         lines.append(f"MATCH (a:Entity {{id:{escape_cypher(f['subject'])}}}), (b:Entity {{id:{escape_cypher(f['object'])}}}) "
                      f"MERGE (a)-[r:{p} {{fact_id:{escape_cypher(f['id'])}}}]->(b) "
-                     f"SET r.source_id={escape_cypher(f['source_id'])}, r.evidence={escape_cypher(f['evidence'])};")
+                     f"SET r.source_id={escape_cypher(f['source_id'])}, r.evidence={escape_cypher(f['evidence'])}, "
+                     f"r.kb_file={escape_cypher(kb_file)};")
     for f in data["facts"]:
         lines.append("MATCH (s:Source {id:" + escape_cypher(f["source_id"]) + "}), "
                      "(e:Entity {id:" + escape_cypher(f["subject"]) + "}) "
-                     "MERGE (s)-[r:SUPPORTS {fact_id:" + escape_cypher(f["id"]) + "}]->(e);")
+                     "MERGE (s)-[r:SUPPORTS {fact_id:" + escape_cypher(f["id"]) + "}]->(e) "
+                     "SET r.source_id=" + escape_cypher(f["source_id"]) +
+                     ", r.kb_file=" + escape_cypher(kb_file) + ";")
     for src in data["sources"]:
         if not src.get("body"):
             continue
@@ -610,5 +651,5 @@ def cypher_export(data=None):
     return "\n".join(lines)+"\n"
 
 
-def graphml_export(path):
-    nx.write_graphml(graph(), str(path))
+def graphml_export(path, data=None):
+    nx.write_graphml(_graph_from_data(data or all_data()), str(path))

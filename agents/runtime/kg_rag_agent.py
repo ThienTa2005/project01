@@ -10,7 +10,7 @@ from .contracts import AgentResult, error_result
 
 class KGRAGAgent:
     name = "KGRAGAgent"
-    version = "kg-rag-v1.0"
+    version = "kg-rag-cypher-v1.1"
 
     def execute(self, request_id: str, question: str = "", *, method: str = "hybrid",
                 top_k: int = 5, hops: int = 2, alpha: float = 0.5,
@@ -34,7 +34,12 @@ class KGRAGAgent:
             )
 
         evidence = [{"type": "source", "id": src.get("id"), "title": src.get("title"),
-                     "url": src.get("url")} for src in result.get("sources", [])]
+                     "url": src.get("url"), "kb_files": src.get("kb_files", [])}
+                    for src in result.get("sources", [])]
+        evidence.extend(
+            {"type": "kb_file", "id": name, "runtime_source": "cypher"}
+            for name in result.get("kb_files", [])
+        )
         return AgentResult(
             request_id=request_id,
             agent=self.name,

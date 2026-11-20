@@ -188,8 +188,8 @@
         <div class="card graph-overview-card">
           <div class="card-title-row"><div><span class="section-kicker">Knowledge Base</span><h3>Tổng quan dữ liệu tri thức</h3></div><span id="neo4j-status" class="status-badge neutral"><i></i>Đang kiểm tra kết nối</span></div>
           <div id="kb-stats" class="stat-cards"></div>
-          <div class="pipeline-wide"><span><b>01</b>Web / PDF nguồn</span><i>→</i><span><b>02</b>Chuẩn hóa thực thể</span><i>→</i><span><b>03</b>Nodes + Relations</span><i>→</i><span><b>04</b>RAG có nguồn</span></div>
-          <div class="actions"><a class="btn ghost" href="/kb-diabetes/kb_diabetes.cypher" download><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>Neo4j Cypher</a><a class="btn ghost" href="/kb-diabetes/kb_diabetes.graphml" download><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>GraphML</a></div>
+          <div class="pipeline-wide"><span><b>01</b>Các file KB Cypher</span><i>→</i><span><b>02</b>Cypher loader / Neo4j</span><i>→</i><span><b>03</b>Nodes + Relations</span><i>→</i><span><b>04</b>Multi-agent RAG có nguồn</span></div>
+          <div class="actions"><span id="kb-cypher-downloads" class="actions"></span><a class="btn ghost" href="/kb-diabetes/kb_diabetes.graphml" download><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>GraphML</a></div>
         </div>
         <div class="card graph-canvas-card"><div class="card-title-row"><div><span class="section-kicker">Interactive map</span><h3>Thực thể và quan hệ</h3></div><label class="inline-control">Thực thể trung tâm<select id="kb-focus"><option value="Đái tháo đường">Đái tháo đường</option></select></label></div><p class="small" id="kb-graph-count"></p><div id="kb-fullgraph" class="graph-wrap graph-large"></div></div>
         <div class="two-column-grid">

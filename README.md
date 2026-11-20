@@ -176,8 +176,8 @@ Dockerfile, Procfile, render.yaml   cấu hình deploy
 | Thành phần | Thực tế chạy | Phạm vi/giới hạn |
 |---|---|---|
 | 3 mô hình dự đoán | `models/*.joblib` đã có từ bản gốc | Pima/100k/BRFSS, vote majority; không dùng để chẩn đoán |
-| Knowledge Base | **7 nguồn, 46 thực thể, 46 quan hệ chuyên môn**, có 46 liên kết tài liệu `SUPPORTS` | Các mệnh đề biên tập có mã nguồn và URL, không phải full-text đã fine-tune |
-| Knowledge Graph | Mặc định chạy bằng NetworkX, xuất GraphML / Cypher | Neo4j database là **tùy chọn**, chưa chạy nếu không đặt credentials. Khi có credentials và đã sync, GraphQueryAgent truy vấn cạnh thực từ Neo4j; khi lỗi, trả nhãn fallback về NetworkX |
+| Knowledge Base | Runtime quét trực tiếp **mọi `knowledge/kb_*.cypher`**; bản hiện tại có 7 nguồn, 46 thực thể, 46 quan hệ chuyên môn | Mỗi fact trả về có `source_id`, `evidence`, `kb_file`; `seed.json` chỉ là tài liệu biên soạn để dựng lại Cypher |
+| Knowledge Graph | Neo4j đọc KB Cypher khi được cấu hình; fallback là NetworkX dựng **từ chính các file Cypher** | Không có nhánh runtime nào âm thầm đọc `seed.json`; API công khai `runtime_source: cypher` và danh sách `kb_files` |
 | Vector RAG | Kết hợp TF-IDF n-gram từ + ký tự, mở rộng đồng nghĩa/ý định | Lexical retrieval cải tiến, không phải semantic embedding |
 | GraphRAG | Tìm thực thể, duyệt cạnh 1–3 chặng | Là retrieval dựa đồ thị, không phải LLM tự viết Cypher |
 | Hybrid | `α × vector_score + (1−α) × graph_score` | Chỉ là phương pháp kết hợp điểm minh họa, chưa benchmark trên ground-truth chuyên gia |
@@ -241,7 +241,7 @@ MATCH (s:Source)-[r:SUPPORTS]->(e:Entity)
 RETURN s,r,e LIMIT 20;
 ```
 
-Có thể cấu hình `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` trong Render Environment để dashboard hiển thị trạng thái **Neo4j kết nối**; runtime web chỉ kiểm tra và thực hiện GraphRAG bằng truy vấn Neo4j READ; không tự sync dữ liệu. Nếu đọc Neo4j lỗi hoặc dữ liệu không tương ứng, chatbot ghi nhãn fallback NetworkX. Vector TF-IDF vẫn đánh chỉ mục nguồn/fact nội bộ. Với cấu hình mặc định, UI ghi rõ **đang dùng NetworkX**. File Cypher có thể dùng bằng `cypher-shell -f knowledge/kb_diabetes.cypher`.
+Có thể cấu hình `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` trong Render Environment để dashboard hiển thị trạng thái **Neo4j kết nối**; runtime web chỉ kiểm tra và thực hiện GraphRAG bằng truy vấn Neo4j READ; không tự sync dữ liệu. Nếu đọc Neo4j lỗi hoặc dữ liệu không tương ứng, chatbot ghi nhãn fallback NetworkX. Vector TF-IDF vẫn đánh chỉ mục nguồn/fact nội bộ. Với cấu hình mặc định, UI ghi rõ **đang dùng NetworkX**. Dùng `python -m scripts.sync_neo4j` để đồng bộ hợp nhất cả 6 KB Cypher lên Neo4j.
 
 ### Thêm nguồn web/PDF vào KB
 
@@ -256,11 +256,11 @@ python -m scripts.ingest_source --pdf path/to/source.pdf
 python -m scripts.build_kb
 ```
 
-Sau khi kiểm tra nội dung, commit `knowledge/extra_sources.json` cùng file GraphML/Cypher mới và push. Nội dung sẽ được RAG đánh chỉ mục trên mỗi truy vấn. Không commit tài liệu sức khỏe cá nhân hoặc nội dung không có quyền phân phối. Nguồn web tải từ xa có thể bị từ chối do chống bot/mất kết nối; KB biên tập vẫn hoạt động offline.
+Lệnh build chia 46 fact đã kiểm duyệt thành 6 KB: `core` (8), `symptoms` (6), `risk_prevention` (10), `diagnosis` (9), `complications` (8) và `treatment` (5). Build sẽ dừng nếu một predicate chưa được phân nhóm hoặc một fact bị bỏ sót. Sau khi kiểm tra nội dung, commit toàn bộ `knowledge/kb_diabetes_*.cypher` cùng GraphML. Runtime chỉ đánh chỉ mục dữ liệu đã có trong các file Cypher. Không commit tài liệu sức khỏe cá nhân hoặc nội dung không có quyền phân phối.
 
 ### Nguồn, dữ liệu huấn luyện và RAG là ba khái niệm khác nhau
 
-- **Nguồn tri thức:** `knowledge/seed.json` chứa trích yếu tự biên tập và URL WHO / NIDDK / CDC / Vinmec. `knowledge/extra_sources.json` chứa nguồn bổ sung (mặc định rỗng).
+- **Nguồn tri thức runtime:** tất cả file khớp `knowledge/kb_*.cypher`. `seed.json` và `extra_sources.json` chỉ là đầu vào biên soạn; thay đổi chúng chưa ảnh hưởng runtime cho tới khi chạy `python -m scripts.build_kb`.
 - **Huấn luyện ML:** dataset nằm trong `data/`, quy trình `main.py` + `agents/data_agent.py` + `agents/model_agent.py` + `agents/evaluator_agent.py`, kết quả model `.joblib` lưu ở `models/`. Việc hỏi chatbot không làm train lại.
 - **Truy xuất RAG:** `knowledge/engine.py` lấy các đoạn và quan hệ phù hợp từ KB để trả lời, không cập nhật tham số mô hình ML.
 
@@ -268,12 +268,12 @@ Sau khi kiểm tra nội dung, commit `knowledge/extra_sources.json` cùng file 
 
 | Endpoint | Mục đích |
 |---|---|
-| `GET /api/kb` | Thống kê, nguồn và câu hỏi mẫu |
+| `GET /api/kb` | Thống kê, nguồn, `runtime_source` và danh sách file KB Cypher |
 | `GET /api/kb/graph` | Nút/cạnh cho đồ thị |
 | `GET /api/kb/path?start=...&end=...&hops=5` | Đường đi đa chặng |
 | `GET /api/kb/neo4j` | Kiểm tra kết nối Neo4j (không tiết lộ secrets) |
 | `GET /api/llm/gemini` | Kiểm tra Gemini enabled/configured/SDK/model, không tiết lộ secret |
-| `GET /kb-diabetes/kb_diabetes.cypher` | Tải file Cypher |
+| `GET /kb-diabetes/<kb_diabetes_*.cypher>` | Tải từng file KB Cypher theo chủ đề |
 | `GET /kb-diabetes/kb_diabetes.graphml` | Tải GraphML |
 | `POST /api/kb/ingest` | JSON `{ "url": "https://..." }` hoặc `multipart` PDF `file` |
 | `POST /api/chat` | `{ "question": "...", "method": "hybrid", "top_k": 5, "hops": 2, "alpha": 0.5, "include_patient": false }` |
@@ -289,6 +289,6 @@ python -m compileall -q app.py service.py knowledge scripts
 
 **Lưu ý deploy:** `requirements-web.txt` đã thêm NetworkX, requests, BeautifulSoup, pypdf, neo4j; `render.yaml` và `Dockerfile` dùng **1 worker** để giảm RAM. Nếu web cũ trên Render trỏ repo cũ, hãy **thay tất cả file bằng bản ZIP này** (không upload ZIP nguyên dạng), commit & push, rồi theo dõi Render Logs. Có sẵn dataset và biểu đồ, nhưng web deploy chỉ cần `models/`, `knowledge/`, `static/`, `templates/`, `outputs/figures`, `outputs/metrics_summary.csv`, các file Python và requirements.
 
-**Khả năng kiểm chứng ngày 12/11/2026:** `pytest -q -p no:cacheprovider tests` đạt **32 test**, gồm core KB/RAG, Flask, hợp đồng agent, luồng MAS đầy đủ, DL inference, validation dừng sớm và RL chỉ-mô-phỏng. `python -m scripts.train_dl_model`, `python -m scripts.build_kb`, `python predict.py --input examples/patient_example.json` và `python make_report.py` chạy được trên Windows. Neo4j Docker local đã được xác nhận với 46 Entity và 92 relationship tổng cộng; chưa xác nhận Render deploy hoặc Neo4j Aura.
+**Khả năng kiểm chứng ngày 20/11/2026:** bộ test không phụ thuộc Gemini (`pytest -q -p no:cacheprovider --ignore=tests/test_gemini.py`) đạt **35 test**, gồm build 6 KB không bỏ sót/trùng fact, Cypher loader, RAG, Flask, hợp đồng agent, MAS, DL inference, validation và RL chỉ-mô-phỏng. `python -m scripts.build_kb` tạo đủ 6 file với tổng 46 fact. Test Gemini cần cài dependency tùy chọn `google-genai`.
 
 **Cảnh báo:** Hệ thống học thuật, không có giá trị chẩn đoán bệnh. Pima chỉ nghiên cứu trên nữ trong quần thể dữ liệu. Tính xác suất từ các quần thể khác nhau có thể lệch hiệu chuẩn; không coi tỷ lệ bỏ phiếu là phần trăm xác suất bệnh.
